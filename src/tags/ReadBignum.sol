@@ -9,27 +9,25 @@ library ReadBignum {
     uint8 internal constant TagUnsignedBignum = 0x02;
     uint8 internal constant TagNegativeBignum = 0x03;
 
-    function UInt256(bytes memory cbor, uint32 i) internal pure returns (uint32, uint256) {
+    function UInt256(bytes memory cbor, uint i) internal pure returns (uint n, uint256 bn) {
         uint8 len;
         i = cbor.Tag(i, TagUnsignedBignum);
         (i, len) = cbor.header8(i, MajorBytes);
         require(len <= 32, "bignum too large");
 
-        uint256 bn;
         assembly ("memory-safe") {
             bn :=
                 shr(
                     // Shift length within word
                     mul(sub(32, len), 8),
                     // Load bytes
-                    mload(add(add(cbor, 32), i))
+                    mload(add(add(cbor, 0x20), i))
                 )
+            n := add(i, len)
         }
-
-        return (i + len, bn);
     }
 
-    function NInt256(bytes memory cbor, uint32 i) internal pure returns (uint32, int256) {
+    function NInt256(bytes memory cbor, uint i) internal pure returns (uint n, int256 nbn) {
         uint8 len;
         i = cbor.Tag(i, TagNegativeBignum);
         (i, len) = cbor.header8(i, MajorBytes);
@@ -42,22 +40,22 @@ library ReadBignum {
                     // Shift length within word
                     mul(sub(32, len), 8),
                     // Load bytes
-                    mload(add(add(cbor, 32), i))
+                    mload(add(add(cbor, 0x20), i))
                 )
+            n := add(i, len)
         }
 
-        require(bn < uint256(type(int256).min), "two's complement int256 will overflow");
-        return (cbor.requireRange(i + len), int256(-1 - int256(bn)));
+        require(bn < uint256(type(int256).min), "int256 will overflow");
+        nbn = -1 - int256(bn);
     }
 
-    function Int256(bytes memory cbor, uint32 i) internal pure returns (uint32, int256) {
-        uint64 tag;
-        (, tag) = cbor.Tag(i);
+    function Int256(bytes memory cbor, uint i) internal pure returns (uint n, int256 ibn) {
+        (, uint64 tag) = cbor.Tag(i);
         if (tag == TagUnsignedBignum) {
             uint256 ubn;
-            (i, ubn) = UInt256(cbor, i);
-            require(ubn <= uint256(type(int256).max), "two's complement int256 will overflow");
-            return (i, int256(ubn));
+            (n, ubn) = UInt256(cbor, i);
+            require(ubn <= uint256(type(int256).max), "int256 will overflow");
+            ibn = int256(ubn);
         } else if (tag == TagNegativeBignum) {
             return NInt256(cbor, i);
         } else {
@@ -65,7 +63,7 @@ library ReadBignum {
         }
     }
 
-    function Integer(bytes memory cbor, uint32 i) internal pure returns (uint32, int256) {
+    function Integer(bytes memory cbor, uint i) internal pure returns (uint, int256) {
         return cbor.isTag(i) ? Int256(cbor, i) : cbor.Int(i);
     }
 }

@@ -27,25 +27,25 @@ contract ReadCidSha256_Test is Test {
 
     function test_NullableCid_nullCbor() public pure {
         (, CidSha256 nullCid) = nullCbor.NullableCid(0);
-        assertEq(nullCid.isNull(), true);
+        assert(nullCid.isNull() == true);
     }
 
     function test_Cid_random(uint256 randomHash) public pure {
         vm.assume(randomHash != 0);
         bytes memory randomCidCbor = abi.encodePacked(dagHead, randomHash);
-        (uint32 i, CidSha256 rando) = randomCidCbor.Cid(0);
-        randomCidCbor.requireComplete(i);
-        assertEq(CidSha256.unwrap(rando), randomHash);
+        (uint i, CidSha256 rando) = randomCidCbor.Cid(0);
+        assert(i == randomCidCbor.length);
+        assert(CidSha256.unwrap(rando) == randomHash);
     }
 
     function test_NullableCid_random(uint256 randomHash) public pure {
         bytes memory randomCidCbor = randomHash != 0 ? abi.encodePacked(dagHead, randomHash) : nullCbor;
-        (uint32 i, CidSha256 rando) = randomCidCbor.NullableCid(0);
-        randomCidCbor.requireComplete(i);
+        (uint i, CidSha256 rando) = randomCidCbor.NullableCid(0);
+        assert(i == randomCidCbor.length);
         if (randomHash == 0) {
-            assertEq(rando.isNull(), true);
+            assert(rando.isNull());
         } else {
-            assertEq(CidSha256.unwrap(rando), randomHash);
+            assert(CidSha256.unwrap(rando) == randomHash);
         }
     }
 

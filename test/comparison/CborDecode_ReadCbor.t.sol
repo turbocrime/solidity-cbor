@@ -32,7 +32,7 @@ contract ComparisonTest is Test {
     function test_decodeFixedArray_ReadCbor() public pure {
         // [1,2,3,4,5,6,7,8,9,10,"test", h'01010101', false, null, true]
         bytes memory input = hex"8F0102030405060708090A64746573744401010101F4F6F5";
-        uint32 index = 0;
+        uint index = 0;
         uint32 arrayLen = 0;
         uint8 num;
         string memory str = "";
@@ -76,7 +76,7 @@ contract ComparisonTest is Test {
 
     function test_decodeFalse_ReadCbor() public pure {
         bytes memory input = hex"f4";
-        uint32 index = 0;
+        uint index = 0;
         bool value;
 
         (index, value) = input.Bool(index);
@@ -85,7 +85,7 @@ contract ComparisonTest is Test {
 
     function test_decodeTrue_ReadCbor() public pure {
         bytes memory input = hex"f5";
-        uint32 index = 0;
+        uint index = 0;
         bool value;
 
         (index, value) = input.Bool(index);
@@ -102,7 +102,7 @@ contract ComparisonTest is Test {
 
     function test_decodeInteger_ReadCbor() public pure {
         bytes memory input = hex"01";
-        uint32 index = 0;
+        uint index = 0;
         uint8 value;
 
         (index, value) = input.UInt8(index);
@@ -111,7 +111,7 @@ contract ComparisonTest is Test {
 
     function test_decodeString_ReadCbor() public pure {
         bytes memory input = hex"6a746573742076616c7565";
-        uint32 index = 0;
+        uint index = 0;
         string memory value;
         string memory expected = "test value";
 
@@ -121,7 +121,7 @@ contract ComparisonTest is Test {
 
     function test_decodeStringWithWeirdChar_ReadCbor() public pure {
         bytes memory input = hex"647A6FC3A9";
-        uint32 index = 0;
+        uint index = 0;
         string memory value;
 
         (index, value) = input.String(index);
@@ -132,7 +132,7 @@ contract ComparisonTest is Test {
     function test_decodeArrayU8_ReadCbor() public pure {
         bytes memory input = hex"8501182b184218ea186f";
 
-        uint32 index = 0;
+        uint index = 0;
         uint32 arrayLen = 0;
         uint8 num;
 

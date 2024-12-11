@@ -20,124 +20,124 @@ contract PeekTest is Test {
     bytes private constant undefinedCbor = hex"f7";
 
     function test_isArray_false() public pure {
-        assertFalse(mapCbor.isArray(0));
+        assert(!mapCbor.isArray(0));
     }
 
     function test_isArray_true() public pure {
-        assertTrue(arrayCbor.isArray(0));
+        assert(arrayCbor.isArray(0));
     }
 
     function test_isBool_false() public pure {
-        assertFalse(undefinedCbor.isBool(0));
+        assert(!undefinedCbor.isBool(0));
     }
 
     function test_isBool_true() public pure {
-        assertTrue(falseCbor.isBool(0));
-        assertTrue(trueCbor.isBool(0));
+        assert(falseCbor.isBool(0));
+        assert(trueCbor.isBool(0));
     }
 
     function test_isBytes_false() public pure {
-        assertFalse(textCbor.isBytes(0));
+        assert(!textCbor.isBytes(0));
     }
 
     function test_isBytes_true() public pure {
-        assertTrue(bytesCbor.isBytes(0));
+        assert(bytesCbor.isBytes(0));
     }
 
     function test_isInt_false() public pure {
-        assertFalse(nullCbor.isInt(0));
+        assert(!nullCbor.isInt(0));
     }
 
     function test_isInt_true() public pure {
-        assertTrue(unsignedCbor.isInt(0));
-        assertTrue(negativeCbor.isInt(0));
+        assert(unsignedCbor.isInt(0));
+        assert(negativeCbor.isInt(0));
     }
 
     function test_isMap_false() public pure {
-        assertFalse(arrayCbor.isMap(0));
+        assert(!arrayCbor.isMap(0));
     }
 
     function test_isMap_true() public pure {
-        assertTrue(mapCbor.isMap(0));
+        assert(mapCbor.isMap(0));
     }
 
     function test_isNInt_false() public pure {
-        assertFalse(unsignedCbor.isNInt(0));
+        assert(!unsignedCbor.isNInt(0));
     }
 
     function test_isNInt_true() public pure {
-        assertTrue(negativeCbor.isNInt(0));
+        assert(negativeCbor.isNInt(0));
     }
 
     function test_isNull_false() public pure {
-        assertFalse(unsignedCbor.isNull(0));
+        assert(!unsignedCbor.isNull(0));
     }
 
     function test_isNull_true() public pure {
-        assertTrue(nullCbor.isNull(0));
+        assert(nullCbor.isNull(0));
     }
 
     function test_isString_false() public pure {
-        assertFalse(bytesCbor.isString(0));
+        assert(!bytesCbor.isString(0));
     }
 
     function test_isString_true() public pure {
-        assertTrue(textCbor.isString(0));
+        assert(textCbor.isString(0));
     }
 
     function test_isTag_expect_false() public pure {
-        assertFalse(tagCbor.isTag(0, 1));
+        assert(!tagCbor.isTag(0, 1));
     }
 
     function test_isTag_expect_true() public pure {
-        assertTrue(tagCbor.isTag(0, 0));
+        assert(tagCbor.isTag(0, 0));
     }
 
     function test_isTag_expect_rand_64(uint64 rand64) public pure {
-        bytes memory cbor = abi.encodePacked(uint8(MajorTag << shiftMajor | MinorExtendU64), uint64(rand64));
-        assertTrue(cbor.isTag(0, uint64(rand64)));
+        bytes memory cbor = bytes.concat(bytes1(MajorTag << shiftMajor | MinorExtendU64), bytes8(rand64));
+        assert(cbor.isTag(0, uint64(rand64)));
     }
 
     function test_isTag_expect_rand_64(uint32 rand32) public pure {
-        bytes memory cbor = abi.encodePacked(uint8(MajorTag << shiftMajor | MinorExtendU32), uint32(rand32));
-        assertTrue(cbor.isTag(0, uint32(rand32)));
+        bytes memory cbor = bytes.concat(bytes1(MajorTag << shiftMajor | MinorExtendU32), bytes4(rand32));
+        assert(cbor.isTag(0, uint32(rand32)));
     }
 
     function test_isTag_expect_rand_16(uint16 rand16) public pure {
-        bytes memory cbor = abi.encodePacked(uint8(MajorTag << shiftMajor | MinorExtendU16), uint16(rand16));
-        assertTrue(cbor.isTag(0, uint16(rand16)));
+        bytes memory cbor = bytes.concat(bytes1(MajorTag << shiftMajor | MinorExtendU16), bytes2(rand16));
+        assert(cbor.isTag(0, uint16(rand16)));
     }
 
     function test_isTag_expect_badminor() public pure {
-        bytes memory cbor = abi.encodePacked(uint8(MajorTag << shiftMajor | (MinorExtendU64 + 1)));
-        assertFalse(cbor.isTag(0, MinorExtendU64 + 1));
+        bytes memory cbor = bytes.concat(bytes1(MajorTag << shiftMajor | (MinorExtendU64 + 1)));
+        assert(!cbor.isTag(0, MinorExtendU64 + 1));
     }
 
     function test_isTag_false() public pure {
-        assertFalse(arrayCbor.isTag(0));
+        assert(!arrayCbor.isTag(0));
     }
 
     function test_isTag_false_expect() public pure {
-        assertFalse(arrayCbor.isTag(0, 0));
+        assert(!arrayCbor.isTag(0, 0));
     }
 
     function test_isTag_true() public pure {
-        assertTrue(tagCbor.isTag(0));
+        assert(tagCbor.isTag(0));
     }
 
     function test_isUInt_false() public pure {
-        assertFalse(negativeCbor.isUInt(0));
+        assert(!negativeCbor.isUInt(0));
     }
 
     function test_isUInt_true() public pure {
-        assertTrue(unsignedCbor.isUInt(0));
+        assert(unsignedCbor.isUInt(0));
     }
 
     function test_isUndefined_false() public pure {
-        assertFalse(unsignedCbor.isUndefined(0));
+        assert(!unsignedCbor.isUndefined(0));
     }
 
     function test_isUndefined_true() public pure {
-        assertTrue(undefinedCbor.isUndefined(0));
+        assert(undefinedCbor.isUndefined(0));
     }
 }
