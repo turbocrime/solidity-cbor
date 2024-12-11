@@ -14,7 +14,7 @@ contract NIntTest is Test {
         uint32 i;
         int16 value;
         (i, value) = cbor.NInt8(i);
-        assertEq(value, -24); // -1 - 23
+        assert(value == -24); // -1 - 23
     }
 
     function test_decodeLongNInt8() public pure {
@@ -22,7 +22,7 @@ contract NIntTest is Test {
         uint32 i;
         int16 value;
         (i, value) = cbor.NInt8(i);
-        assertEq(value, -25); // -1 - 24
+        assert(value == -25); // -1 - 24
     }
 
     function testFail_invalidNInt8() public pure {
@@ -30,7 +30,7 @@ contract NIntTest is Test {
         uint32 i;
         int16 value;
         (i, value) = cbor.NInt8(i);
-        assertEq(value, -24);
+        assert(value == -24);
     }
 
     function test_decodeNInt8() public pure {
@@ -38,7 +38,7 @@ contract NIntTest is Test {
         uint32 i;
         int16 value;
         (i, value) = cbor.NInt8(0);
-        assertEq(value, -256); // -1 - 255
+        assert(value == -256); // -1 - 255
     }
 
     function testFail_notNInt8() public pure {
@@ -53,7 +53,7 @@ contract NIntTest is Test {
         uint32 i;
         int24 value;
         (i, value) = cbor.NInt16(0);
-        assertEq(value, -65536); // -1 - 65535
+        assert(value == -65536); // -1 - 65535
     }
 
     function test_decodeNInt32() public pure {
@@ -61,7 +61,7 @@ contract NIntTest is Test {
         uint32 i;
         int40 value;
         (i, value) = cbor.NInt32(0);
-        assertEq(value, -4294967296); // -1 - 4294967295
+        assert(value == -4294967296); // -1 - 4294967295
     }
 
     function test_decodeNInt64() public pure {
@@ -69,7 +69,7 @@ contract NIntTest is Test {
         uint32 i;
         int72 value;
         (i, value) = cbor.NInt64(0);
-        assertEq(value, -18446744073709551616); // -1 - 18446744073709551615
+        assert(value == -18446744073709551616); // -1 - 18446744073709551615
     }
 
     function test_decodeSmallNInts() public pure {
@@ -77,11 +77,11 @@ contract NIntTest is Test {
         uint32 i;
         int16 value;
         (i, value) = cbor.NInt8(0);
-        assertEq(value, -1);
+        assert(value == -1);
 
         cbor = hex"21"; // minor literal -2
         (i, value) = cbor.NInt8(0);
-        assertEq(value, -2);
+        assert(value == -2);
     }
 
     function testFail_outOfBoundsNInt16() public pure {

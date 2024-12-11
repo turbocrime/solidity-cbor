@@ -25,7 +25,7 @@ library ReadBignum {
                 )
             n := add(i, len)
         }
-        cbor.requireRange(n);
+        require(n <= cbor.length, "index out of range");
     }
 
     function NInt256(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int256 nbn) {
@@ -48,7 +48,7 @@ library ReadBignum {
 
         require(bn < uint256(type(int256).min), "two's complement int256 will overflow");
         nbn = -1 - int256(bn);
-        cbor.requireRange(n);
+        require(n <= cbor.length, "index out of range");
     }
 
     function Int256(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int256 ibn) {

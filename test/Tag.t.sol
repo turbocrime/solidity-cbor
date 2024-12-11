@@ -13,15 +13,15 @@ contract TagTest is Test {
         uint32 i;
         uint64 tag;
         (i, tag) = cbor.Tag(i);
-        cbor.requireComplete(i);
-        assertEq(tag, 0);
+        assert(i == cbor.length);
+        assert(tag == 0);
     }
 
     function test_decodeExpectedTag() public pure {
         bytes memory cbor = hex"c0"; // Tag(0)
         uint32 i;
         i = cbor.Tag(i, 0);
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function testFail_unexpectedTag() public pure {

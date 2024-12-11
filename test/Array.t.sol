@@ -13,7 +13,7 @@ contract ArrayTest is Test {
         uint32 i;
         uint len;
         (i, len) = cbor.Array(i);
-        assertEq(len, 0);
+        assert(len == 0);
     }
 
     function test_decodeLargeArray() public pure {
@@ -22,7 +22,7 @@ contract ArrayTest is Test {
         uint32 i;
         uint len;
         (i, len) = cbor.Array(i);
-        assertEq(len, 23);
+        assert(len == 23);
     }
 
     // Test nested structures
@@ -35,25 +35,25 @@ contract ArrayTest is Test {
         uint8 value;
 
         (i, outerLen) = cbor.Array(0);
-        assertEq(outerLen, 2);
+        assert(outerLen == 2);
 
         (i, innerLen) = cbor.Array(i);
-        assertEq(innerLen, 2);
+        assert(innerLen == 2);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 1);
+        assert(value == 1);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 2);
+        assert(value == 2);
 
         (i, innerLen) = cbor.Array(i);
-        assertEq(innerLen, 2);
+        assert(innerLen == 2);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 3);
+        assert(value == 3);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 4);
+        assert(value == 4);
     }
 
     function test_decodeSingleElementArray() public pure {
@@ -63,10 +63,10 @@ contract ArrayTest is Test {
         uint8 value;
 
         (i, len) = cbor.Array(0);
-        assertEq(len, 1);
+        assert(len == 1);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 0xff);
+        assert(value == 0xff);
     }
 
     function test_decodeMixedArray() public pure {
@@ -80,18 +80,18 @@ contract ArrayTest is Test {
         uint innerLen;
 
         (i, len) = cbor.Array(i);
-        assertEq(len, 3);
+        assert(len == 3);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 1);
+        assert(value == 1);
 
         (i, strValue) = cbor.String(i);
-        assertEq(bytes1(bytes(strValue)), "a");
+        assert(bytes1(bytes(strValue)) == "a");
 
         (i, innerLen) = cbor.Array(i);
-        assertEq(innerLen, 1);
+        assert(innerLen == 1);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 2);
+        assert(value == 2);
     }
 }

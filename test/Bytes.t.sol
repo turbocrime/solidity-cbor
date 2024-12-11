@@ -15,7 +15,7 @@ contract BytesTest is Test {
         uint32 i;
         bytes memory value;
         (i, value) = cbor.Bytes(0);
-        require(value.length == 24, "failed to decode 24-byte bytes");
+        assert(value.length == 24);
     }
 
     function test_decodeEmptyBytes() public pure {
@@ -23,8 +23,8 @@ contract BytesTest is Test {
         uint32 i;
         bytes memory value;
         (i, value) = cbor.Bytes(0);
-        cbor.requireComplete(i);
-        assertEq(value.length, 0);
+        assert(i == cbor.length);
+        assert(value.length == 0);
     }
 
     function test_decodeShortBytes() public pure {
@@ -33,7 +33,7 @@ contract BytesTest is Test {
         uint32 i;
         bytes memory value;
         (i, value) = cbor.Bytes(0);
-        assertEq(value.length, 23);
+        assert(value.length == 23);
     }
 
     function test_decodeLongBytes() public pure {
@@ -42,7 +42,7 @@ contract BytesTest is Test {
         uint32 i;
         bytes memory value;
         (i, value) = cbor.Bytes(0);
-        assertEq(value.length, 24);
+        assert(value.length == 24);
     }
 
     function testFail_invalidBytes() public pure {
@@ -59,9 +59,9 @@ contract BytesTest is Test {
         bytes32 value;
         uint8 len;
         (i, value, len) = cbor.Bytes32(0);
-        cbor.requireComplete(i);
-        assertEq(len, 1);
-        assertEq(value, bytes32(hex"00"));
+        assert(i == cbor.length);
+        assert(len == 1);
+        assert(value == bytes32(hex"00"));
     }
 
     function testFail_Bytes32_long() public pure {
@@ -71,9 +71,9 @@ contract BytesTest is Test {
         bytes32 value;
         uint8 len;
         (i, value, len) = cbor.Bytes32(0);
-        cbor.requireComplete(i);
-        assertEq(len, 33);
-        assertEq(value, bytes32(hex"000102030405060708090a0b0c0d0e0f101112131415161718192021"));
+        assert(i == cbor.length);
+        assert(len == 33);
+        assert(value == bytes32(hex"000102030405060708090a0b0c0d0e0f101112131415161718192021"));
     }
 
     function testFail_Bytes32_parameter() public pure {
@@ -87,12 +87,12 @@ contract BytesTest is Test {
     function test_skipBytes() public pure {
         bytes memory cbor = hex"4100";
         uint32 i = cbor.skipBytes(0);
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function testFail_skipBytes() public pure {
         bytes memory cbor = hex"30";
         uint32 i = cbor.skipBytes(0);
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 }

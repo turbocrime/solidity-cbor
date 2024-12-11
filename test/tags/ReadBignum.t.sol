@@ -36,8 +36,8 @@ contract ReadBignum_Test is Test {
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
-        cbor.requireComplete(i);
-        assertEq(value, 0xFF);
+        assert(i == cbor.length);
+        assert(value == 0xFF);
     }
 
     function test_UInt256_multi() public pure {
@@ -47,8 +47,8 @@ contract ReadBignum_Test is Test {
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
-        cbor.requireComplete(i);
-        assertEq(value, 0x12345678);
+        assert(i == cbor.length);
+        assert(value == 0x12345678);
     }
 
     function test_UInt256_max() public pure {
@@ -57,8 +57,8 @@ contract ReadBignum_Test is Test {
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
-        assertEq(value, type(uint256).max);
-        cbor.requireComplete(i);
+        assert(value == type(uint256).max);
+        assert(i == cbor.length);
     }
 
     function testFail_UInt256_large() public pure {
@@ -70,7 +70,7 @@ contract ReadBignum_Test is Test {
         (i, value) = cbor.UInt256(i);
 
         // unreachable
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function test_UInt256_middle() public pure {
@@ -83,10 +83,10 @@ contract ReadBignum_Test is Test {
 
         (i, len) = cbor.Array(i);
         (i, value) = cbor.UInt256(i);
-        assertEq(value, 0x123456);
+        assert(value == 0x123456);
         (i, foo) = cbor.String(i);
-        cbor.requireComplete(i);
-        assertEq(foo, "foo");
+        assert(i == cbor.length);
+        assert(bytes3(bytes(foo)) == "foo");
     }
 
     function test_NInt256_single() public pure {
@@ -96,8 +96,8 @@ contract ReadBignum_Test is Test {
         int256 value;
 
         (i, value) = cbor.NInt256(i);
-        assertEq(value, -1 - 0xFF);
-        cbor.requireComplete(i);
+        assert(value == -1 - 0xFF);
+        assert(i == cbor.length);
     }
 
     function test_NInt256_multi() public pure {
@@ -107,8 +107,8 @@ contract ReadBignum_Test is Test {
         int256 value;
 
         (i, value) = cbor.NInt256(i);
-        assertEq(value, -1 - 0x12345678);
-        cbor.requireComplete(i);
+        assert(value == -1 - 0x12345678);
+        assert(i == cbor.length);
     }
 
     function test_NInt256_max() public pure {
@@ -117,8 +117,8 @@ contract ReadBignum_Test is Test {
         int256 value;
 
         (i, value) = cbor.NInt256(i);
-        assertEq(value, type(int256).min);
-        cbor.requireComplete(i);
+        assert(value == type(int256).min);
+        assert(i == cbor.length);
     }
 
     function testFail_NInt256_overflow() public pure {
@@ -130,7 +130,7 @@ contract ReadBignum_Test is Test {
         (i, value) = cbor.NInt256(i);
 
         // unreachable
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function testFail_NInt256_maxu256() public pure {
@@ -143,7 +143,7 @@ contract ReadBignum_Test is Test {
         (i, value) = cbor.NInt256(i);
 
         // unreachable
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function testFail_NInt256_large() public pure {
@@ -155,7 +155,7 @@ contract ReadBignum_Test is Test {
         (i, value) = cbor.NInt256(i);
 
         // unreachable
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function test_NInt256_middle() public pure {
@@ -168,10 +168,10 @@ contract ReadBignum_Test is Test {
 
         (i, len) = cbor.Array(i);
         (i, value) = cbor.NInt256(i);
-        assertEq(value, -1 - 0x123456);
+        assert(value == -1 - 0x123456);
         (i, foo) = cbor.String(i);
-        cbor.requireComplete(i);
-        assertEq(foo, "foo");
+        assert(i == cbor.length);
+        assert(bytes3(bytes(foo)) == "foo");
     }
 
     function test_UInt256_random(uint256 randU) public pure {
@@ -180,8 +180,8 @@ contract ReadBignum_Test is Test {
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
-        assertEq(value, randU);
-        cbor.requireComplete(i);
+        assert(value == randU);
+        assert(i == cbor.length);
     }
 
     function test_NInt256_random(int256 randN) public pure {
@@ -193,8 +193,8 @@ contract ReadBignum_Test is Test {
         int256 value;
 
         (i, value) = cbor.NInt256(i);
-        assertEq(value, randN);
-        cbor.requireComplete(i);
+        assert(value == randN);
+        assert(i == cbor.length);
     }
 
     function test_Integer() public pure {
@@ -207,7 +207,7 @@ contract ReadBignum_Test is Test {
         for (uint8 i = 0; i < len; i++) {
             (j, value) = cbor.Integer(j);
         }
-        cbor.requireComplete(j);
+        assert(j == cbor.length);
     }
 
     function testFail_Integer_UInt256_max() public pure {
@@ -216,8 +216,8 @@ contract ReadBignum_Test is Test {
         int256 value;
 
         (i, value) = cbor.Integer(i);
-        assertEq(uint256(value), type(uint256).max);
-        cbor.requireComplete(i);
+        assert(uint256(value) == type(uint256).max);
+        assert(i == cbor.length);
     }
 
     function testFail_Int256_notbignum() public pure {

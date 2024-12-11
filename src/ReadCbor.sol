@@ -80,22 +80,6 @@ library ReadCbor {
         }
     }
 
-    /// @notice Ensures the current index is within bounds
-    /// @param cbor The CBOR-encoded bytes
-    /// @param i The index to check
-    /// @dev Reverts if index is out of range
-    function requireRange(bytes memory cbor, uint32 i) internal pure {
-        require(i <= cbor.length, "index out of range");
-    }
-
-    /// @notice Verifies that all CBOR bytes have been read (index == cbor.length)
-    /// @param cbor The CBOR-encoded bytes
-    /// @param i The current index
-    /// @dev Reverts if there are unread bytes remaining
-    function requireComplete(bytes memory cbor, uint32 i) internal pure {
-        require(i == cbor.length, "expected to read all bytes");
-    }
-
     /// @notice Reads a CBOR header, and possibly header extension
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
@@ -360,7 +344,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        requireRange(cbor, n);
+        require(n <= cbor.length, "index out of range");
     }
 
     /// @notice Reads a string item into a bytes32 and advances the index
@@ -393,7 +377,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        requireRange(cbor, n);
+        require(n <= cbor.length, "index out of range");
     }
 
     /// @notice Reads a single-byte string item and advances the index
@@ -421,7 +405,7 @@ library ReadCbor {
         uint32 len;
         (i, len) = header32(cbor, i, MajorText);
         n = i + len;
-        requireRange(cbor, n);
+        require(n <= cbor.length, "index out of range");
     }
 
     /// @notice Checks if the next item is a byte string
@@ -450,7 +434,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        requireRange(cbor, n);
+        require(n <= cbor.length, "index out of range");
     }
 
     /// @notice Reads a byte string item into a bytes32 and advances the index
@@ -482,7 +466,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        requireRange(cbor, n);
+        require(n <= cbor.length, "index out of range");
     }
 
     /// @notice Skips a byte string item and advances the index
@@ -493,7 +477,7 @@ library ReadCbor {
         uint32 len;
         (i, len) = header32(cbor, i, MajorBytes);
         n = i + len;
-        requireRange(cbor, n);
+        require(n <= cbor.length, "index out of range");
     }
 
     /// @notice Checks if the next item is a tag

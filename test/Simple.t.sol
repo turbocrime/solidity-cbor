@@ -13,7 +13,7 @@ contract SimpleTest is Test {
         uint32 i;
         bool value;
         (i, value) = cbor.Bool(i);
-        assertEq(value, false);
+        assert(value == false);
     }
 
     function test_decodeTrue() public pure {
@@ -21,7 +21,7 @@ contract SimpleTest is Test {
         uint32 i;
         bool value;
         (i, value) = cbor.Bool(i);
-        assertEq(value, true);
+        assert(value == true);
     }
 
     function testFail_decodeBool() public pure {

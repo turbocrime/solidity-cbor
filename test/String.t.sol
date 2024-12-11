@@ -15,7 +15,7 @@ contract StringTest is Test {
         uint32 i;
         string memory value;
         (i, value) = cbor.String(0);
-        require(bytes(value).length == 24, "failed to decode 24-byte string");
+        assert(bytes(value).length == 24);
     }
 
     // Test string handling
@@ -24,7 +24,7 @@ contract StringTest is Test {
         uint32 i;
         string memory value;
         (i, value) = cbor.String(0);
-        assertEq(bytes(value).length, 0);
+        assert(bytes(value).length == 0);
     }
 
     function test_decodeShortString() public pure {
@@ -33,7 +33,7 @@ contract StringTest is Test {
         uint32 i;
         string memory value;
         (i, value) = cbor.String(0);
-        assertEq(bytes(value).length, 23);
+        assert(bytes(value).length == 23);
     }
 
     function test_decodeLongString() public pure {
@@ -42,7 +42,7 @@ contract StringTest is Test {
         uint32 i;
         string memory value;
         (i, value) = cbor.String(0);
-        assertEq(bytes(value).length, 23);
+        assert(bytes(value).length == 23);
     }
 
     function testFail_invalidString() public pure {
@@ -59,9 +59,9 @@ contract StringTest is Test {
         bytes32 value;
         uint8 len;
         (i, value, len) = cbor.String32(0);
-        cbor.requireComplete(i);
-        assertEq(len, 1);
-        assertEq(value, bytes32("a"));
+        assert(i == cbor.length);
+        assert(len == 1);
+        assert(value == "a");
     }
 
     function testFail_String32_long() public pure {
@@ -71,9 +71,10 @@ contract StringTest is Test {
         bytes32 value;
         uint8 len;
         (i, value, len) = cbor.String32(0);
-        cbor.requireComplete(i);
-        assertEq(len, 33);
-        assertEq(value, bytes32("thisisquitealongstringisuppose.."));
+        assert(i == cbor.length);
+        assert(len == 33);
+        // missing the last character
+        assert(value == bytes32("thisisquitealongstringisuppose.."));
     }
 
     function testFail_String32_parameter() public pure {
@@ -87,13 +88,13 @@ contract StringTest is Test {
     function test_skipString() public pure {
         bytes memory cbor = hex"6161";
         uint32 i = cbor.skipString(0);
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function testFail_skipString() public pure {
         bytes memory cbor = hex"50";
         uint32 i = cbor.skipString(0);
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 
     function test_String1() public pure {
@@ -101,8 +102,8 @@ contract StringTest is Test {
         uint32 i;
         bytes1 value;
         (i, value) = cbor.String1(0);
-        cbor.requireComplete(i);
-        assertEq(value, bytes1("a"));
+        assert(i == cbor.length);
+        assert(value == bytes1("a"));
     }
 
     function testFail_String1() public pure {
@@ -110,6 +111,6 @@ contract StringTest is Test {
         uint32 i;
         bytes1 value;
         (i, value) = cbor.String1(0);
-        cbor.requireComplete(i);
+        assert(i == cbor.length);
     }
 }

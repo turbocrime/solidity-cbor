@@ -14,7 +14,7 @@ contract MapTest is Test {
         uint32 i;
         uint len;
         (i, len) = cbor.Map(0);
-        require(len == 0, "failed to decode empty map");
+        assert(len == 0);
     }
 
     // Additional map tests
@@ -27,15 +27,15 @@ contract MapTest is Test {
         uint8 value;
 
         (i, len) = cbor.Map(i);
-        assertEq(len, 1);
+        assert(len == 1);
 
         (i, key) = cbor.String(i);
-        assertEq(bytes1(bytes(key)), "a");
+        assert(bytes1(bytes(key)) == "a");
 
         (i, arrayLen) = cbor.Array(i);
-        assertEq(arrayLen, 1);
+        assert(arrayLen == 1);
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 2);
+        assert(value == 2);
     }
 
     // Test deeply nested structures
@@ -49,34 +49,34 @@ contract MapTest is Test {
         uint8 value;
 
         (i, len) = cbor.Map(0);
-        assertEq(len, 1);
+        assert(len == 1);
 
         (i, key,) = cbor.String32(i, 1);
-        assertEq(bytes1(key), "a");
+        assert(bytes1(key) == "a");
 
         (i, len) = cbor.Map(i);
-        assertEq(len, 1);
+        assert(len == 1);
 
         (i, key,) = cbor.String32(i, 1);
-        assertEq(bytes1(key), "b");
+        assert(bytes1(key) == "b");
 
         (i, len) = cbor.Map(i);
-        assertEq(len, 1);
+        assert(len == 1);
 
         (i, key,) = cbor.String32(i, 1);
-        assertEq(bytes1(key), "c");
+        assert(bytes1(key) == "c");
 
         (i, arrayLen) = cbor.Array(i);
-        assertEq(arrayLen, 3);
+        assert(arrayLen == 3);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 1);
+        assert(value == 1);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 2);
+        assert(value == 2);
 
         (i, value) = cbor.UInt8(i);
-        assertEq(value, 3);
+        assert(value == 3);
     }
 
     function test_decodeNestedMap() public pure {
@@ -89,53 +89,56 @@ contract MapTest is Test {
         uint8 value;
 
         (i, outerLen) = cbor.Map(0);
-        require(outerLen == 2, "outer map length mismatch");
+        assert(outerLen == 2);
 
-        /*
         uint32 kLen;
         (i, key, kLen) = cbor.String32(i, 1);
-        require(kLen == 1 && bytes1(key) == "a", "first key mismatch");
+        assert(kLen == 1);
+        assert(bytes1(key) == "a");
 
         (i, innerLen) = cbor.Map(i);
-        require(innerLen == 2, "inner map length mismatch");
+        assert(innerLen == 2);
 
         (i, key, kLen) = cbor.String32(i, 1);
-        require(kLen == 1 && bytes1(key) == "b", "inner first key mismatch");
+        assert(kLen == 1);
+        assert(bytes1(key) == "b");
         (i, value) = cbor.UInt8(i);
-        require(value == 1, "inner first value mismatch");
+        assert(value == 1);
 
         (i, key, kLen) = cbor.String32(i, 1);
-        require(kLen == 1 && bytes1(key) == "c", "inner second key mismatch");
+        assert(kLen == 1);
+        assert(bytes1(key) == "c");
         (i, value) = cbor.UInt8(i);
-        require(value == 2, "inner second value mismatch");
+        assert(value == 2);
 
         (i, key, kLen) = cbor.String32(i, 1);
-        require(kLen == 1 && bytes1(key) == "d", "second key mismatch");
+        assert(kLen == 1);
+        assert(bytes1(key) == "d");
         (i, value) = cbor.UInt8(i);
-        require(value == 3, "second value mismatch");
-        */
+        assert(value == 3);
+
         (i, outerLen) = cbor.Map(0);
-        require(outerLen == 2, "outer map length mismatch");
+        assert(outerLen == 2);
 
         (i, key,) = cbor.String32(i, 1);
-        require((key) == "a", "first key mismatch");
+        assert(key == "a");
 
         (i, innerLen) = cbor.Map(i);
-        require(innerLen == 2, "inner map length mismatch");
+        assert(innerLen == 2);
 
         (i, key,) = cbor.String32(i, 1);
-        require((key) == "b", "inner first key mismatch");
+        assert(key == "b");
         (i, value) = cbor.UInt8(i);
-        require(value == 1, "inner first value mismatch");
+        assert(value == 1);
 
         (i, key,) = cbor.String32(i, 1);
-        require((key) == "c", "inner second key mismatch");
+        assert(key == "c");
         (i, value) = cbor.UInt8(i);
-        require(value == 2, "inner second value mismatch");
+        assert(value == 2);
 
         (i, key,) = cbor.String32(i, 1);
-        require((key) == "d", "second key mismatch");
+        assert(key == "d");
         (i, value) = cbor.UInt8(i);
-        require(value == 3, "second value mismatch");
+        assert(value == 3);
     }
 }
