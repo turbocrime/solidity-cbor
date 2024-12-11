@@ -10,11 +10,8 @@ using ReadCbor for bytes;
 contract RangeTest is Test {
     function test_requireRange() public pure {
         bytes memory cbor = hex"0102";
-        uint32 i = cbor.requireRange(1); // Should succeed
-        assertEq(i, 1);
-
-        i = cbor.requireRange(2); // Should succeed at end
-        assertEq(i, 2);
+        cbor.requireRange(1); // Should succeed
+        cbor.requireRange(2); // Should succeed at end
     }
 
     function testFail_requireRange() public pure {
@@ -24,13 +21,11 @@ contract RangeTest is Test {
 
     function test_requireComplete() public pure {
         bytes memory cbor = hex"0102";
-        uint32 i = 2;
-        cbor.requireComplete(i); // Should succeed - at end
+        cbor.requireComplete(2); // Should succeed - at end
     }
 
     function testFail_requireComplete() public pure {
         bytes memory cbor = hex"0102";
-        uint32 i = 1;
-        cbor.requireComplete(i); // Should fail - not at end
+        cbor.requireComplete(1); // Should fail - not at end
     }
 }
