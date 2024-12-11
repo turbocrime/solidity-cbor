@@ -349,9 +349,9 @@ library ReadCbor {
 
         ret = new string(len);
         assembly ("memory-safe") {
-            for { let j := 0 } lt(j, len) { j := add(j, 0x20) } {
-                mstore(add(ret, add(0x20, j)), mload(add(cbor, add(i, add(0x20, j)))))
-            }
+            let src := add(cbor, add(0x20, i))
+            let dest := add(ret, 0x20)
+            mcopy(dest, src, len)
         }
 
         return (requireRange(cbor, i + len), ret);
@@ -434,15 +434,11 @@ library ReadCbor {
         uint32 len;
         (i, len) = header32(cbor, i, MajorBytes);
 
-        bytes memory bor = cbor;
-        uint s = i;
-
         ret = new bytes(len);
         assembly ("memory-safe") {
-            for { let j := 0 } lt(j, len) { j := add(j, 0x20) } {
-                mstore(add(ret, add(0x20, j)), mload(add(bor, add(0x20, s))))
-                s := add(s, 0x20)
-            }
+            let src := add(cbor, add(0x20, i))
+            let dest := add(ret, 0x20)
+            mcopy(dest, src, len)
         }
 
         return (requireRange(cbor, i + len), ret);
