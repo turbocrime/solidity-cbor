@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.28;
 
+import "forge-std/console.sol";
 import "../ReadCbor.sol";
 
 // we will only encounter CID v1 dag-cbor sha256, which perfectly fits uint256.
@@ -45,10 +46,8 @@ library ReadCidSha256 {
     //       12    │ multihash type sha-256
     //       20    │ multihash size 32 bytes
     //    ─────────┴─────────
-    bytes6 private constant cborTag42_cborBytes37_multibaseCidV1 = hex"D82A58250001";
-    bytes1 private constant multicodecDagCbor = hex"71";
-    bytes1 private constant multicodecRaw = hex"55";
-    bytes2 private constant multihashSha256_multihashBytes32 = hex"1220";
+    bytes9 private constant cborTag42_cborBytes37_multibaseCidV1_multicodecZERO_multihashSha256_multihashBytes32 =
+        hex"D82A58250001001220";
 
     /**
      * @notice Reads a CID from CBOR encoded data at the specified byte index
@@ -65,7 +64,7 @@ library ReadCidSha256 {
      * @return CidSha256 The representative hash
      */
     function Cid(bytes memory cbor, uint32 i) internal pure returns (uint32, CidSha256) {
-        return Cid(cbor, i, multicodecDagCbor);
+        return Cid(cbor, i, 0x71);
     }
 
     function Cid(bytes memory cbor, uint32 i, bytes1 multicodec)
@@ -73,19 +72,22 @@ library ReadCidSha256 {
         pure
         returns (uint32 n, CidSha256 cidSha256)
     {
-        assert(multicodec == multicodecDagCbor || multicodec == multicodecRaw);
-        bytes9 cborMultibase;
-        bytes9 expect =
-            bytes9(bytes.concat(cborTag42_cborBytes37_multibaseCidV1, multicodec, multihashSha256_multihashBytes32));
-
+        bytes9 expect;
+        bytes9 cborHeader;
         assembly ("memory-safe") {
+            // expected head
+            expect :=
+                or(
+                    cborTag42_cborBytes37_multibaseCidV1_multicodecZERO_multihashSha256_multihashBytes32,
+                    shr(0x30, multicodec)
+                )
             // cbor header at index
-            cborMultibase := mload(add(cbor, add(0x20, i)))
+            cborHeader := mload(add(cbor, add(0x20, i)))
             cidSha256 := mload(add(cbor, add(0x29, i)))
             n := add(i, 41) // 4 bytes cbor header + 5 bytes multibase header + 32 bytes hash
         }
 
-        require(cborMultibase == expect, "Expected CBOR tag 42 and 37-byte CIDv1");
+        require(expect == cborHeader, "Expected CBOR tag 42 and 37-byte CIDv1");
         require(!cidSha256.isNull(), "Expected non-zero CID value");
 
         cbor.requireRange(n);
