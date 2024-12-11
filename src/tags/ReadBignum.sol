@@ -25,7 +25,7 @@ library ReadBignum {
                 )
             n := add(i, len)
         }
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     function NInt256(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int256 nbn) {
@@ -46,9 +46,9 @@ library ReadBignum {
             n := add(i, len)
         }
 
-        require(bn < uint256(type(int256).min), "two's complement int256 will overflow");
+        require(bn < uint256(type(int256).min), "int256 will overflow");
         nbn = -1 - int256(bn);
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     function Int256(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int256 ibn) {
@@ -56,7 +56,7 @@ library ReadBignum {
         if (tag == TagUnsignedBignum) {
             uint256 ubn;
             (n, ubn) = UInt256(cbor, i);
-            require(ubn <= uint256(type(int256).max), "two's complement int256 will overflow");
+            require(ubn <= uint256(type(int256).max), "int256 will overflow");
             ibn = int256(ubn);
         } else if (tag == TagNegativeBignum) {
             return NInt256(cbor, i);

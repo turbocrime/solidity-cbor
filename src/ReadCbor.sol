@@ -344,7 +344,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     /// @notice Reads a string item into a bytes32 and advances the index
@@ -369,7 +369,7 @@ library ReadCbor {
     {
         assert(maxLen <= 32);
         (i, len) = header8(cbor, i, MajorText);
-        require(len <= maxLen, "string length out of range");
+        require(len <= maxLen);
 
         assembly ("memory-safe") {
             ret := mload(add(cbor, add(0x20, i)))
@@ -377,7 +377,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     /// @notice Reads a single-byte string item and advances the index
@@ -405,7 +405,7 @@ library ReadCbor {
         uint32 len;
         (i, len) = header32(cbor, i, MajorText);
         n = i + len;
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     /// @notice Checks if the next item is a byte string
@@ -434,7 +434,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     /// @notice Reads a byte string item into a bytes32 and advances the index
@@ -458,7 +458,7 @@ library ReadCbor {
     {
         assert(maxLen <= 32);
         (i, len) = header8(cbor, i, MajorBytes);
-        require(len <= maxLen, "bytes length out of range");
+        require(len <= maxLen);
 
         assembly ("memory-safe") {
             ret := mload(add(cbor, add(0x20, i)))
@@ -466,7 +466,7 @@ library ReadCbor {
             n := add(i, len)
         }
 
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     /// @notice Skips a byte string item and advances the index
@@ -477,7 +477,7 @@ library ReadCbor {
         uint32 len;
         (i, len) = header32(cbor, i, MajorBytes);
         n = i + len;
-        require(n <= cbor.length, "index out of range");
+        require(n <= cbor.length);
     }
 
     /// @notice Checks if the next item is a tag
