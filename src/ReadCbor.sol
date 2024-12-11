@@ -100,14 +100,15 @@ library ReadCbor {
     /// @notice Reads a CBOR header, and possibly header extension
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index, type argument, and major type
-    function header(bytes memory cbor, uint32 i) internal pure returns (uint32, uint64 arg, uint8 major) {
+    /// @return n The new index
+    /// @return arg The type argument
+    /// @return major The major type
+    function header(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint64 arg, uint8 major) {
         uint8 h;
         (i, h) = u8(cbor, i);
         major = h >> shiftMajor;
         uint8 minor = h & maskMinor;
-        (i, arg) = parseArg(cbor, i, minor);
-        return (i, arg, major);
+        (n, arg) = parseArg(cbor, i, minor);
     }
 
     /// @notice Reads a CBOR header with an expected major type
@@ -148,9 +149,9 @@ library ReadCbor {
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @param expectMajor The expected major type
-    /// @return The new index and argument value
+    /// @return n The new index and argument value
     /// @dev For u8 type arguments only (literal minor or 1-byte extended)
-    function header8(bytes memory cbor, uint32 i, uint8 expectMajor) internal pure returns (uint32, uint8 arg) {
+    function header8(bytes memory cbor, uint32 i, uint8 expectMajor) internal pure returns (uint32 n, uint8 arg) {
         uint8 major;
 
         assembly ("memory-safe") {
@@ -171,16 +172,17 @@ library ReadCbor {
             require(arg >= MinorExtendU8, "invalid extended header");
         }
 
-        return (i, arg);
+        n = i;
     }
 
     /// @notice Optimized header reading for uint32 type arguments of an expected major type
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @param expectMajor The expected major type
-    /// @return The new index and argument value
+    /// @return n The new index
+    /// @return arg The argument value
     /// @dev For type arguments expected to specify a length, uint32 is sufficient
-    function header32(bytes memory cbor, uint32 i, uint8 expectMajor) internal pure returns (uint32, uint32 arg) {
+    function header32(bytes memory cbor, uint32 i, uint8 expectMajor) internal pure returns (uint32 n, uint32 arg) {
         uint8 major;
 
         assembly ("memory-safe") {
@@ -213,7 +215,7 @@ library ReadCbor {
             }
         }
 
-        return (i, arg);
+        n = i;
     }
 
     /// @notice Checks if the next item is null
@@ -274,18 +276,18 @@ library ReadCbor {
     /// @notice Reads a boolean item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the boolean value
+    /// @return n The new index
+    /// @return isTrue The boolean value
     /// @dev Reverts if item is not a boolean
-    function Bool(bytes memory cbor, uint32 i) internal pure returns (uint32, bool isTrue) {
+    function Bool(bytes memory cbor, uint32 i) internal pure returns (uint32 n, bool isTrue) {
         bool isFalse;
         assembly ("memory-safe") {
             let h := byte(0, mload(add(add(cbor, 0x20), i)))
             isTrue := eq(h, or(shl(shiftMajor, MajorPrimitive), SimpleTrue))
             isFalse := eq(h, or(shl(shiftMajor, MajorPrimitive), SimpleFalse))
-            i := add(i, 1)
+            n := add(i, 1)
         }
         require(isFalse || isTrue, "expected boolean");
-        return (i, isTrue);
     }
 
     /// @notice Checks if the next item is an array
@@ -342,8 +344,9 @@ library ReadCbor {
     /// @notice Reads a string item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the string value
-    function String(bytes memory cbor, uint32 i) internal pure returns (uint32, string memory ret) {
+    /// @return n The new index
+    /// @return ret The string value
+    function String(bytes memory cbor, uint32 i) internal pure returns (uint32 n, string memory ret) {
         uint32 len;
         (i, len) = header32(cbor, i, MajorText);
 
@@ -354,7 +357,7 @@ library ReadCbor {
             mcopy(dest, src, len)
         }
 
-        return (requireRange(cbor, i + len), ret);
+        n = requireRange(cbor, i + len);
     }
 
     /// @notice Reads a string item into a bytes32 and advances the index
@@ -362,7 +365,7 @@ library ReadCbor {
     /// @param i The current index
     /// @return The new index, the bytes32 value, and the string length
     /// @dev Reverts if string length exceeds 32
-    function String32(bytes memory cbor, uint32 i) internal pure returns (uint32, bytes32 ret, uint8 len) {
+    function String32(bytes memory cbor, uint32 i) internal pure returns (uint32, bytes32, uint8) {
         return String32(cbor, i, 32);
     }
 
@@ -370,12 +373,12 @@ library ReadCbor {
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @param maxLen The maximum allowed string length, which must be <= 32
-    /// @return The new index, the bytes32 value, and the string length
+    /// @return n The new index, the bytes32 value, and the string length
     /// @dev Reverts if string length exceeds maxLen
     function String32(bytes memory cbor, uint32 i, uint8 maxLen)
         internal
         pure
-        returns (uint32, bytes32 ret, uint8 len)
+        returns (uint32 n, bytes32 ret, uint8 len)
     {
         assert(maxLen <= 32);
         (i, len) = header8(cbor, i, MajorText);
@@ -386,24 +389,23 @@ library ReadCbor {
             ret := and(ret, not(shr(mul(len, 8), not(0))))
         }
 
-        return (requireRange(cbor, i + len), ret, uint8(len));
+        n = requireRange(cbor, i + len);
     }
 
     /// @notice Reads a single-byte string item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the single byte value
+    /// @return n The new index and the single byte value
     /// @dev Reverts if string length is not exactly 1
-    function String1(bytes memory cbor, uint32 i) internal pure returns (uint32, bytes1 s) {
+    function String1(bytes memory cbor, uint32 i) internal pure returns (uint32 n, bytes1 s) {
         bool valid;
         assembly ("memory-safe") {
             let h := shr(248, mload(add(add(cbor, 0x20), i))) // load header byte
             valid := eq(h, or(shl(shiftMajor, MajorText), 1))
             s := mload(add(add(add(cbor, 0x20), i), 1)) // load string byte
-            i := add(i, 2)
+            n := add(i, 2)
         }
         require(valid, "expected single-byte string");
-        return (i, s);
     }
 
     /// @notice Skips a string item and advances the index
@@ -429,8 +431,8 @@ library ReadCbor {
     /// @notice Reads a byte string item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the byte string value
-    function Bytes(bytes memory cbor, uint32 i) internal pure returns (uint32, bytes memory ret) {
+    /// @return n The new index and the byte string value
+    function Bytes(bytes memory cbor, uint32 i) internal pure returns (uint32 n, bytes memory ret) {
         uint32 len;
         (i, len) = header32(cbor, i, MajorBytes);
 
@@ -441,7 +443,7 @@ library ReadCbor {
             mcopy(dest, src, len)
         }
 
-        return (requireRange(cbor, i + len), ret);
+        n = requireRange(cbor, i + len);
     }
 
     /// @notice Reads a byte string item into a bytes32 and advances the index
@@ -456,12 +458,12 @@ library ReadCbor {
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @param maxLen The maximum allowed byte string length, which must be <= 32
-    /// @return The new index, the bytes32 value, and the byte string length
+    /// @return n The new index, the bytes32 value, and the byte string length
     /// @dev Reverts if byte string length exceeds maxLen
     function Bytes32(bytes memory cbor, uint32 i, uint8 maxLen)
         internal
         pure
-        returns (uint32, bytes32 ret, uint8 len)
+        returns (uint32 n, bytes32 ret, uint8 len)
     {
         assert(maxLen <= 32);
         (i, len) = header8(cbor, i, MajorBytes);
@@ -472,7 +474,7 @@ library ReadCbor {
             ret := and(ret, not(shr(mul(len, 8), not(0))))
         }
 
-        return (requireRange(cbor, i + len), ret, uint8(len));
+        n = requireRange(cbor, i + len);
     }
 
     /// @notice Skips a byte string item and advances the index
@@ -506,7 +508,6 @@ library ReadCbor {
             let h := shr(248, mload(add(add(cbor, 0x20), i)))
 
             if eq(shr(shiftMajor, h), MajorTag) {
-                //let arg := and(h, maskMinor)
                 arg := and(h, maskMinor)
                 i := add(i, 1)
                 if gt(arg, 0x17) {
@@ -527,7 +528,7 @@ library ReadCbor {
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @return The new index and the tag value
-    function Tag(bytes memory cbor, uint32 i) internal pure returns (uint32, uint64 tag) {
+    function Tag(bytes memory cbor, uint32 i) internal pure returns (uint32, uint64) {
         return header(cbor, i, MajorTag);
     }
 
@@ -595,8 +596,7 @@ library ReadCbor {
     /// @param i The current index
     /// @return The new index and the uint64 value
     function UInt64(bytes memory cbor, uint32 i) internal pure returns (uint32, uint64 ret) {
-        (i, ret) = header(cbor, i, MajorUnsigned, MinorExtendU64);
-        return (i, ret);
+        return header(cbor, i, MajorUnsigned, MinorExtendU64);
     }
 
     /// @notice Checks if the next item is a negative integer
