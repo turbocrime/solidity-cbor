@@ -68,31 +68,27 @@ library ReadCidSha256 {
         return Cid(cbor, i, multicodecDagCbor);
     }
 
-    function Cid(bytes memory cbor, uint32 i, bytes1 multicodec) internal pure returns (uint32, CidSha256) {
+    function Cid(bytes memory cbor, uint32 i, bytes1 multicodec)
+        internal
+        pure
+        returns (uint32 n, CidSha256 cidSha256)
+    {
         assert(multicodec == multicodecDagCbor || multicodec == multicodecRaw);
         bytes9 cborMultibase;
         bytes9 expect =
-            bytes9(abi.encodePacked(cborTag42_cborBytes37_multibaseCidV1, multicodec, multihashSha256_multihashBytes32));
-
-        uint256 cidSha256; // 32 bytes
+            bytes9(bytes.concat(cborTag42_cborBytes37_multibaseCidV1, multicodec, multihashSha256_multihashBytes32));
 
         assembly ("memory-safe") {
             // cbor header at index
             cborMultibase := mload(add(cbor, add(0x20, i)))
             cidSha256 := mload(add(cbor, add(0x29, i)))
+            n := add(i, 41) // 4 bytes cbor header + 5 bytes multibase header + 32 bytes hash
         }
 
         require(cborMultibase == expect, "Expected CBOR tag 42 and 37-byte CIDv1");
-        require(cidSha256 != 0, "Expected non-zero CID value");
+        require(!cidSha256.isNull(), "Expected non-zero CID value");
 
-        return (
-            cbor.requireRange(
-                i + 4 // cbor header
-                    + 5 // multibase header
-                    + 32 // hash size
-            ),
-            CidSha256.wrap(cidSha256)
-        );
+        cbor.requireRange(n);
     }
 
     /**
