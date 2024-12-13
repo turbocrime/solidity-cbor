@@ -32,7 +32,7 @@ library ReadCbor {
     /// @return arg The parsed argument value
     function parseArg(bytes memory cbor, uint i, uint8 minor) private pure returns (uint n, uint64 arg) {
         if (minor < MinorExtendU8) {
-            return (i, minor);
+            (n, arg) = (i, minor);
         } else if (minor == MinorExtendU8) {
             (n, arg) = u8(cbor, i);
             require(arg >= MinorExtendU8, "invalid type argument (single-byte value too low)");
@@ -87,10 +87,10 @@ library ReadCbor {
     /// @return major The major type
     function header(bytes memory cbor, uint i) internal pure returns (uint n, uint64 arg, uint8 major) {
         uint8 h;
-        (i, h) = u8(cbor, i);
+        (n, h) = u8(cbor, i);
         major = h >> shiftMajor;
         uint8 minor = h & maskMinor;
-        (n, arg) = parseArg(cbor, i, minor);
+        (n, arg) = parseArg(cbor, n, minor);
     }
 
     /// @notice Reads a CBOR header with an expected major type
@@ -102,9 +102,9 @@ library ReadCbor {
     /// @dev Reverts if major type doesn't match expected
     function header(bytes memory cbor, uint i, uint8 expectMajor) internal pure returns (uint n, uint64 arg) {
         uint8 h;
-        (i, h) = u8(cbor, i);
+        (n, h) = u8(cbor, i);
         require(h >> shiftMajor == expectMajor, "unexpected major type");
-        (n, arg) = parseArg(cbor, i, h & maskMinor);
+        (n, arg) = parseArg(cbor, n, h & maskMinor);
     }
 
     /// @notice Reads a CBOR header with expected major and minor types
@@ -121,12 +121,12 @@ library ReadCbor {
         returns (uint n, uint64 arg)
     {
         uint8 h;
-        (i, h) = u8(cbor, i);
+        (n, h) = u8(cbor, i);
         uint8 major = h >> shiftMajor;
         require(major == expectMajor, "unexpected major type");
         uint8 minor = h & maskMinor;
         require(minor == expectMinor, "unexpected minor type");
-        (n, arg) = parseArg(cbor, i, minor);
+        (n, arg) = parseArg(cbor, n, minor);
     }
 
     /// @notice Optimized header reading for uint8 type arguments of an expected major type
@@ -332,15 +332,15 @@ library ReadCbor {
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @return n The new index
-    /// @return ret The string value
-    function String(bytes memory cbor, uint i) internal pure returns (uint n, string memory ret) {
+    /// @return str The string value
+    function String(bytes memory cbor, uint i) internal pure returns (uint n, string memory str) {
         uint32 len;
         (i, len) = header32(cbor, i, MajorText);
 
-        ret = new string(len);
+        str = new string(len);
         assembly ("memory-safe") {
             let src := add(cbor, add(0x20, i))
-            let dest := add(ret, 0x20)
+            let dest := add(str, 0x20)
             mcopy(dest, src, len)
             n := add(i, len)
         }
@@ -411,15 +411,15 @@ library ReadCbor {
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @return n The new index
-    /// @return b The byte string value
-    function Bytes(bytes memory cbor, uint i) internal pure returns (uint n, bytes memory b) {
+    /// @return bts The byte string value
+    function Bytes(bytes memory cbor, uint i) internal pure returns (uint n, bytes memory bts) {
         uint32 len;
         (i, len) = header32(cbor, i, MajorBytes);
 
-        b = new bytes(len);
+        bts = new bytes(len);
         assembly ("memory-safe") {
             let src := add(cbor, add(0x20, i))
-            let dest := add(b, 0x20)
+            let dest := add(bts, 0x20)
             mcopy(dest, src, len)
             n := add(i, len)
         }
@@ -430,17 +430,17 @@ library ReadCbor {
     /// @param i The current index
     /// @param maxLen The maximum allowed byte string length, which must be <= 32
     /// @return n The new index
-    /// @return b The bytes32 value
+    /// @return bts The bytes32 value
     /// @return len The byte string length
     /// @dev Reverts if byte string length exceeds maxLen
-    function Bytes32(bytes memory cbor, uint i, uint8 maxLen) internal pure returns (uint n, bytes32 b, uint8 len) {
+    function Bytes32(bytes memory cbor, uint i, uint8 maxLen) internal pure returns (uint n, bytes32 bts, uint8 len) {
         assert(maxLen <= 32);
         (i, len) = header8(cbor, i, MajorBytes);
         require(len <= maxLen);
 
         assembly ("memory-safe") {
-            b := mload(add(cbor, add(0x20, i)))
-            b := and(b, not(shr(mul(len, 8), not(0))))
+            bts := mload(add(cbor, add(0x20, i)))
+            bts := and(bts, not(shr(mul(len, 8), not(0))))
             n := add(i, len)
         }
     }
