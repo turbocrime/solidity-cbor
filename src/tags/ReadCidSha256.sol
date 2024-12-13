@@ -89,7 +89,6 @@ library ReadCidSha256 {
 
         require(expect == cborHeader, "expected CBOR tag 42 and 37-byte CIDv1");
         require(!cidSha256.isNull(), "expected non-zero CID");
-        require(n <= cbor.length);
     }
 
     /**

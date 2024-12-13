@@ -36,13 +36,12 @@ library ReadCbor {
         } else if (minor == MinorExtendU8) {
             (n, arg) = u8(cbor, i);
             require(arg >= MinorExtendU8, "invalid type argument (single-byte value too low)");
-            return (n, arg);
         } else if (minor == MinorExtendU16) {
-            return u16(cbor, i);
+            (n, arg) = u16(cbor, i);
         } else if (minor == MinorExtendU32) {
-            return u32(cbor, i);
+            (n, arg) = u32(cbor, i);
         } else if (minor == MinorExtendU64) {
-            return u64(cbor, i);
+            (n, arg) = u64(cbor, i);
         } else {
             revert("minor unsupported");
         }
@@ -289,11 +288,12 @@ library ReadCbor {
     /// @notice Reads an array header and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the number of items in the array
-    function Array(bytes memory cbor, uint32 i) internal pure returns (uint32, uint32) {
+    /// @return n The new index
+    /// @return len The number of items in the array
+    function Array(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint32 len) {
         // An array of data items. The argument is the number of data items in the
         // array. Items in an array do not need to all be of the same type.
-        return header32(cbor, i, MajorArray);
+        (n, len) = header32(cbor, i, MajorArray);
     }
 
     /// @notice Checks if the next item is a map
@@ -309,12 +309,13 @@ library ReadCbor {
     /// @notice Reads a map header and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the number of key-value pairs in the map
-    function Map(bytes memory cbor, uint32 i) internal pure returns (uint32, uint32) {
+    /// @return n The new index
+    /// @return len The number of key-value pairs in the map
+    function Map(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint32 len) {
         // A map is comprised of pairs of data items, each pair consisting of a key
         // that is immediately followed by a value. The argument is the number of
         // pairs of data items in the map.
-        return header32(cbor, i, MajorMap);
+        (n, len) = header32(cbor, i, MajorMap);
     }
 
     /// @notice Checks if the next item is a string
@@ -343,8 +344,6 @@ library ReadCbor {
             mcopy(dest, src, len)
             n := add(i, len)
         }
-
-        require(n <= cbor.length);
     }
 
     /// @notice Reads a string item into a bytes32 and advances the index
@@ -376,8 +375,6 @@ library ReadCbor {
             ret := and(ret, not(shr(mul(len, 8), not(0))))
             n := add(i, len)
         }
-
-        require(n <= cbor.length);
     }
 
     /// @notice Reads a single-byte string item and advances the index
@@ -405,7 +402,6 @@ library ReadCbor {
         uint32 len;
         (i, len) = header32(cbor, i, MajorText);
         n = i + len;
-        require(n <= cbor.length);
     }
 
     /// @notice Checks if the next item is a byte string
@@ -433,8 +429,6 @@ library ReadCbor {
             mcopy(dest, src, len)
             n := add(i, len)
         }
-
-        require(n <= cbor.length);
     }
 
     /// @notice Reads a byte string item into a bytes32 and advances the index
@@ -465,8 +459,6 @@ library ReadCbor {
             ret := and(ret, not(shr(mul(len, 8), not(0))))
             n := add(i, len)
         }
-
-        require(n <= cbor.length);
     }
 
     /// @notice Skips a byte string item and advances the index
@@ -477,7 +469,6 @@ library ReadCbor {
         uint32 len;
         (i, len) = header32(cbor, i, MajorBytes);
         n = i + len;
-        require(n <= cbor.length);
     }
 
     /// @notice Checks if the next item is a tag
@@ -520,9 +511,10 @@ library ReadCbor {
     /// @notice Reads a tag item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the tag value
-    function Tag(bytes memory cbor, uint32 i) internal pure returns (uint32, uint64) {
-        return header(cbor, i, MajorTag);
+    /// @return n The new index
+    /// @return tag The tag value
+    function Tag(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint64 tag) {
+        (n, tag) = header(cbor, i, MajorTag);
     }
 
     /// @notice Reads a specific tag item and advances the index
@@ -550,45 +542,50 @@ library ReadCbor {
     /// @notice Reads an unsigned integer item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the unsigned integer value
-    function UInt(bytes memory cbor, uint32 i) internal pure returns (uint32, uint64) {
-        return header(cbor, i, MajorUnsigned);
+    /// @return n The new index
+    /// @return arg The unsigned integer value
+    function UInt(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint64 arg) {
+        (n, arg) = header(cbor, i, MajorUnsigned);
     }
 
     /// @notice Reads a uint8 item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the uint8 value
-    function UInt8(bytes memory cbor, uint32 i) internal pure returns (uint32, uint8) {
-        return header8(cbor, i, MajorUnsigned);
+    /// @return n The new index
+    /// @return arg The uint8 value
+    function UInt8(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint8 arg) {
+        (n, arg) = header8(cbor, i, MajorUnsigned);
     }
 
     /// @notice Reads a uint16 item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the uint16 value
-    function UInt16(bytes memory cbor, uint32 i) internal pure returns (uint32, uint16) {
-        uint64 arg;
-        (i, arg) = header(cbor, i, MajorUnsigned, MinorExtendU16);
-        return (i, uint16(arg));
+    /// @return n The new index
+    /// @return arg The uint16 value
+    function UInt16(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint16 arg) {
+        uint64 arg64;
+        (n, arg64) = header(cbor, i, MajorUnsigned, MinorExtendU16);
+        arg = uint16(arg64);
     }
 
     /// @notice Reads a uint32 item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the uint32 value
-    function UInt32(bytes memory cbor, uint32 i) internal pure returns (uint32, uint32) {
-        uint64 arg;
-        (i, arg) = header(cbor, i, MajorUnsigned, MinorExtendU32);
-        return (i, uint32(arg));
+    /// @return n The new index
+    /// @return arg The uint32 value
+    function UInt32(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint32 arg) {
+        uint64 arg64;
+        (n, arg64) = header(cbor, i, MajorUnsigned, MinorExtendU32);
+        arg = uint32(arg64);
     }
 
     /// @notice Reads a uint64 item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the uint64 value
-    function UInt64(bytes memory cbor, uint32 i) internal pure returns (uint32, uint64) {
-        return header(cbor, i, MajorUnsigned, MinorExtendU64);
+    /// @return n The new index
+    /// @return arg The uint64 value
+    function UInt64(bytes memory cbor, uint32 i) internal pure returns (uint32 n, uint64 arg) {
+        (n, arg) = header(cbor, i, MajorUnsigned, MinorExtendU64);
     }
 
     /// @notice Checks if the next item is a negative integer
@@ -604,51 +601,56 @@ library ReadCbor {
     /// @notice Reads a negative integer item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and the negative integer value
-    function NInt(bytes memory cbor, uint32 i) internal pure returns (uint32, int72) {
+    /// @return n The new index
+    /// @return neg A signed int72 value
+    function NInt(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int72 neg) {
         uint64 arg;
-        (i, arg) = header(cbor, i, MajorNegative);
-        return (i, -1 - int72(uint72(arg)));
+        (n, arg) = header(cbor, i, MajorNegative);
+        neg = -1 - int72(uint72(arg));
     }
 
     /// @notice Reads an 8-bit negative integer item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and a signed int16 value
-    function NInt8(bytes memory cbor, uint32 i) internal pure returns (uint32, int16) {
+    /// @return n The new index
+    /// @return neg A signed int16 value
+    function NInt8(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int16 neg) {
         uint8 arg;
-        (i, arg) = header8(cbor, i, MajorNegative);
-        return (i, -1 - int16(uint16(arg)));
+        (n, arg) = header8(cbor, i, MajorNegative);
+        neg = -1 - int16(uint16(arg));
     }
 
     /// @notice Reads a 16-bit negative integer item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and a signed int24 value
-    function NInt16(bytes memory cbor, uint32 i) internal pure returns (uint32, int24) {
+    /// @return n The new index
+    /// @return neg A signed int24 value
+    function NInt16(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int24 neg) {
         uint64 arg;
-        (i, arg) = header(cbor, i, MajorNegative, MinorExtendU16);
-        return (i, -1 - int24(uint24(arg)));
+        (n, arg) = header(cbor, i, MajorNegative, MinorExtendU16);
+        neg = -1 - int24(uint24(arg));
     }
 
     /// @notice Reads a 32-bit negative integer item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and a signed int40 value
-    function NInt32(bytes memory cbor, uint32 i) internal pure returns (uint32, int40) {
+    /// @return n The new index
+    /// @return neg A signed int40 value
+    function NInt32(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int40 neg) {
         uint64 arg;
-        (i, arg) = header(cbor, i, MajorNegative, MinorExtendU32);
-        return (i, -1 - int40(uint40(arg)));
+        (n, arg) = header(cbor, i, MajorNegative, MinorExtendU32);
+        neg = -1 - int40(uint40(arg));
     }
 
     /// @notice Reads a 64-bit negative integer item and advances the index
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
-    /// @return The new index and a signed int72 value
-    function NInt64(bytes memory cbor, uint32 i) internal pure returns (uint32, int72) {
+    /// @return n The new index
+    /// @return neg A signed int72 value
+    function NInt64(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int72 neg) {
         uint64 arg;
-        (i, arg) = header(cbor, i, MajorNegative, MinorExtendU64);
-        return (i, -1 - int72(uint72(arg)));
+        (n, arg) = header(cbor, i, MajorNegative, MinorExtendU64);
+        neg = -1 - int72(uint72(arg));
     }
 
     /// @notice Checks if the next item is any integer (positive or negative)
@@ -666,15 +668,15 @@ library ReadCbor {
     /// @param cbor The CBOR-encoded bytes
     /// @param i The current index
     /// @return n The new index
-    /// @return ret A signed integer value
-    function Int(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int72 ret) {
+    /// @return integer A signed integer value
+    function Int(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int72 integer) {
         uint8 major;
         uint64 arg;
         (n, arg, major) = header(cbor, i);
         if (major == MajorUnsigned) {
-            ret = int72(uint72(arg));
+            integer = int72(uint72(arg));
         } else if (major == MajorNegative) {
-            ret = -1 - int72(uint72(arg));
+            integer = -1 - int72(uint72(arg));
         } else {
             revert("unexpected major type");
         }

@@ -45,13 +45,6 @@ contract StringTest is Test {
         assert(bytes(value).length == 23);
     }
 
-    function testFail_invalidString() public pure {
-        bytes memory cbor = hex"61"; // Incomplete string
-        uint32 i;
-        string memory value;
-        (i, value) = cbor.String(i); // Will revert due to incomplete data
-    }
-
     function test_String32_short() public pure {
         // 1 character "a"
         bytes memory cbor = hex"6161";

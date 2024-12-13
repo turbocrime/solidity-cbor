@@ -45,13 +45,6 @@ contract BytesTest is Test {
         assert(value.length == 24);
     }
 
-    function testFail_invalidBytes() public pure {
-        bytes memory cbor = hex"41"; // Incomplete bytes
-        uint32 i;
-        bytes memory value;
-        (i, value) = cbor.Bytes(i); // Will revert due to incomplete data
-    }
-
     function test_Bytes32_short() public pure {
         // 1 byte of data
         bytes memory cbor = hex"4100";

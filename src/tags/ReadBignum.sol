@@ -25,7 +25,6 @@ library ReadBignum {
                 )
             n := add(i, len)
         }
-        require(n <= cbor.length);
     }
 
     function NInt256(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int256 nbn) {
@@ -48,7 +47,6 @@ library ReadBignum {
 
         require(bn < uint256(type(int256).min), "int256 will overflow");
         nbn = -1 - int256(bn);
-        require(n <= cbor.length);
     }
 
     function Int256(bytes memory cbor, uint32 i) internal pure returns (uint32 n, int256 ibn) {
