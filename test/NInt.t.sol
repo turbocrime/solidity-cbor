@@ -11,7 +11,7 @@ contract NIntTest is Test {
     // Test basic integer types
     function test_decodeShortNInt8() public pure {
         bytes memory cbor = hex"37"; // max minor literal uint8 for negative
-        uint32 i;
+        uint i;
         int16 value;
         (i, value) = cbor.NInt8(i);
         assert(value == -24); // -1 - 23
@@ -19,7 +19,7 @@ contract NIntTest is Test {
 
     function test_decodeLongNInt8() public pure {
         bytes memory cbor = hex"3818"; // minimum header extension uint8 for negative
-        uint32 i;
+        uint i;
         int16 value;
         (i, value) = cbor.NInt8(i);
         assert(value == -25); // -1 - 24
@@ -27,7 +27,7 @@ contract NIntTest is Test {
 
     function testFail_invalidNInt8() public pure {
         bytes memory cbor = hex"3817"; // extended header too small
-        uint32 i;
+        uint i;
         int16 value;
         (i, value) = cbor.NInt8(i);
         assert(value == -24);
@@ -35,7 +35,7 @@ contract NIntTest is Test {
 
     function test_decodeNInt8() public pure {
         bytes memory cbor = hex"38ff"; // max uint8 for negative
-        uint32 i;
+        uint i;
         int16 value;
         (i, value) = cbor.NInt8(0);
         assert(value == -256); // -1 - 255
@@ -43,14 +43,14 @@ contract NIntTest is Test {
 
     function testFail_notNInt8() public pure {
         bytes memory cbor = hex"39ffff"; // uint16 value
-        uint32 i;
+        uint i;
         int16 value;
         (i, value) = cbor.NInt8(0); // Should fail as value exceeds int8
     }
 
     function test_decodeNInt16() public pure {
         bytes memory cbor = hex"39ffff"; // max uint16 for negative
-        uint32 i;
+        uint i;
         int24 value;
         (i, value) = cbor.NInt16(0);
         assert(value == -65536); // -1 - 65535
@@ -58,7 +58,7 @@ contract NIntTest is Test {
 
     function test_decodeNInt32() public pure {
         bytes memory cbor = hex"3affffffff"; // max uint32 for negative
-        uint32 i;
+        uint i;
         int40 value;
         (i, value) = cbor.NInt32(0);
         assert(value == -4294967296); // -1 - 4294967295
@@ -66,7 +66,7 @@ contract NIntTest is Test {
 
     function test_decodeNInt64() public pure {
         bytes memory cbor = hex"3bffffffffffffffff"; // max uint64 for negative
-        uint32 i;
+        uint i;
         int72 value;
         (i, value) = cbor.NInt64(0);
         assert(value == -18446744073709551616); // -1 - 18446744073709551615
@@ -74,7 +74,7 @@ contract NIntTest is Test {
 
     function test_decodeSmallNInts() public pure {
         bytes memory cbor = hex"20"; // minor literal -1
-        uint32 i;
+        uint i;
         int16 value;
         (i, value) = cbor.NInt8(0);
         assert(value == -1);
@@ -86,7 +86,7 @@ contract NIntTest is Test {
 
     function testFail_outOfBoundsNInt16() public pure {
         bytes memory cbor = hex"3a00010000"; // uint32 value
-        uint32 i;
+        uint i;
         int24 value;
         (i, value) = cbor.NInt16(0); // Should fail as value exceeds int16
     }

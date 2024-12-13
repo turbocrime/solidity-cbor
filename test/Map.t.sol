@@ -11,7 +11,7 @@ contract MapTest is Test {
     // Test map handling
     function test_decodeEmptyMap() public pure {
         bytes memory cbor = hex"a0"; // Empty map in CBOR
-        uint32 i;
+        uint i;
         uint len;
         (i, len) = cbor.Map(0);
         assert(len == 0);
@@ -20,7 +20,7 @@ contract MapTest is Test {
     // Additional map tests
     function test_decodeSingleKeyMap() public pure {
         bytes memory cbor = hex"a161618102"; // {"a": [2]}
-        uint32 i;
+        uint i;
         uint len;
         string memory key;
         uint arrayLen;
@@ -42,7 +42,7 @@ contract MapTest is Test {
     function test_deeplyNestedStructure() public pure {
         // {"a": {"b": {"c": [1, 2, 3]}}}
         bytes memory cbor = hex"a16161a16162a1616383010203";
-        uint32 i;
+        uint i;
         uint len;
         bytes32 key;
         uint arrayLen;
@@ -82,7 +82,7 @@ contract MapTest is Test {
     function test_decodeNestedMap() public pure {
         // {"a": {"b": 1, "c": 2}, "d": 3}
         bytes memory cbor = hex"a26161a2616201616302616403";
-        uint32 i;
+        uint i;
         uint outerLen;
         uint innerLen;
         bytes32 key;

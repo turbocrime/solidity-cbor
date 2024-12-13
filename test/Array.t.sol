@@ -10,7 +10,7 @@ contract ArrayTest is Test {
     // Test array handling
     function test_decodeEmptyArray() public pure {
         bytes memory cbor = hex"80"; // Empty array in CBOR
-        uint32 i;
+        uint i;
         uint len;
         (i, len) = cbor.Array(i);
         assert(len == 0);
@@ -19,7 +19,7 @@ contract ArrayTest is Test {
     function test_decodeLargeArray() public pure {
         // Array with 23 elements (just below the threshold for extended header)
         bytes memory cbor = hex"97010101010101010101010101010101010101010101010101";
-        uint32 i;
+        uint i;
         uint len;
         (i, len) = cbor.Array(i);
         assert(len == 23);
@@ -29,7 +29,7 @@ contract ArrayTest is Test {
     function test_decodeNestedArray() public pure {
         // [[1, 2], [3, 4]]
         bytes memory cbor = hex"82820102820304";
-        uint32 i;
+        uint i;
         uint outerLen;
         uint innerLen;
         uint8 value;
@@ -58,7 +58,7 @@ contract ArrayTest is Test {
 
     function test_decodeSingleElementArray() public pure {
         bytes memory cbor = hex"8118ff"; // [0xff]
-        uint32 i;
+        uint i;
         uint len;
         uint8 value;
 
@@ -73,7 +73,7 @@ contract ArrayTest is Test {
         // [1, "a", [2]]
         bytes memory cbor = hex"830161618102";
 
-        uint32 i;
+        uint i;
         uint len;
         uint8 value;
         string memory strValue;

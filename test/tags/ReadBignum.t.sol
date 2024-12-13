@@ -32,7 +32,7 @@ contract ReadBignum_Test is Test {
 
     function test_UInt256_single() public pure {
         bytes memory cbor = abi.encodePacked(HeadUBn, bytesHead(1), hex"ff");
-        uint32 i;
+        uint i;
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
@@ -43,7 +43,7 @@ contract ReadBignum_Test is Test {
     function test_UInt256_multi() public pure {
         // 2(h'12345678')
         bytes memory cbor = hex"c24412345678";
-        uint32 i;
+        uint i;
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
@@ -53,7 +53,7 @@ contract ReadBignum_Test is Test {
 
     function test_UInt256_max() public pure {
         bytes memory cbor = abi.encodePacked(HeadUBn, bytesHead(32), type(uint256).max);
-        uint32 i;
+        uint i;
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
@@ -64,7 +64,7 @@ contract ReadBignum_Test is Test {
     function testFail_UInt256_large() public pure {
         // a 33-byte positive bigint is too large to be a uint256
         bytes memory cbor = abi.encodePacked(HeadUBn, bytesHead(32 + 1), type(uint256).max, hex"ff");
-        uint32 i;
+        uint i;
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
@@ -76,7 +76,7 @@ contract ReadBignum_Test is Test {
     function test_UInt256_middle() public pure {
         // [2(h'123456'), "foo"]
         bytes memory cbor = hex"82c24312345663666F6F";
-        uint32 i;
+        uint i;
         uint32 len;
         uint256 value;
         string memory foo;
@@ -92,7 +92,7 @@ contract ReadBignum_Test is Test {
     function test_NInt256_single() public pure {
         // 3(h'ff')
         bytes memory cbor = hex"c341ff";
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.NInt256(i);
@@ -103,7 +103,7 @@ contract ReadBignum_Test is Test {
     function test_NInt256_multi() public pure {
         // 3(h'12345678')
         bytes memory cbor = hex"c34412345678";
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.NInt256(i);
@@ -113,7 +113,7 @@ contract ReadBignum_Test is Test {
 
     function test_NInt256_max() public pure {
         bytes memory cbor = abi.encodePacked(HeadNBn, bytesHead(32), uint256(type(int256).min) - 1);
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.NInt256(i);
@@ -124,7 +124,7 @@ contract ReadBignum_Test is Test {
     function testFail_NInt256_overflow() public pure {
         // Invalid: one more than the 'maximum' negative number that can be represented as an int256
         bytes memory cbor = abi.encodePacked(HeadNBn, bytesHead(32), uint256(type(int256).min));
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.NInt256(i);
@@ -137,7 +137,7 @@ contract ReadBignum_Test is Test {
         // Invalid: maximum uint256 value as negative bignum
         // 3(h'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
         bytes memory cbor = abi.encodePacked(HeadNBn, bytesHead(32), bytes32(type(uint256).max));
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.NInt256(i);
@@ -149,7 +149,7 @@ contract ReadBignum_Test is Test {
     function testFail_NInt256_large() public pure {
         // Invalid: 33-byte negative bignum is too large for int256
         bytes memory cbor = abi.encodePacked(HeadNBn, bytesHead(32 + 1), bytes32(type(uint256).max), hex"ff");
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.NInt256(i);
@@ -161,7 +161,7 @@ contract ReadBignum_Test is Test {
     function test_NInt256_middle() public pure {
         // [3(h'123456'), "foo"]
         bytes memory cbor = hex"82c34312345663666F6F";
-        uint32 i;
+        uint i;
         uint32 len;
         int256 value;
         string memory foo;
@@ -176,7 +176,7 @@ contract ReadBignum_Test is Test {
 
     function test_UInt256_random(uint256 randU) public pure {
         bytes memory cbor = abi.encodePacked(HeadUBn, bytesHead(32), randU);
-        uint32 i;
+        uint i;
         uint256 value;
 
         (i, value) = cbor.UInt256(i);
@@ -189,7 +189,7 @@ contract ReadBignum_Test is Test {
         vm.assume(randN != type(int256).min);
 
         bytes memory cbor = abi.encodePacked(HeadNBn, bytesHead(32), (randN < 0 ? -randN : randN) - 1);
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.NInt256(i);
@@ -200,7 +200,7 @@ contract ReadBignum_Test is Test {
     function test_Integer() public pure {
         bytes memory cbor =
             hex"8C08387E18FF397FFE19FFFF3A7FFFFFFE1AFFFFFFFF3B7FFFFFFFFFFFFFFE1BFFFFFFFFFFFFFFFFC3507FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC250FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC358207FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-        uint32 j;
+        uint j;
         int256 value;
         uint32 len;
         (j, len) = cbor.Array(j);
@@ -212,7 +212,7 @@ contract ReadBignum_Test is Test {
 
     function testFail_Integer_UInt256_max() public pure {
         bytes memory cbor = abi.encodePacked(HeadUBn, bytesHead(32), type(uint256).max);
-        uint32 i;
+        uint i;
         int256 value;
 
         (i, value) = cbor.Integer(i);
@@ -222,7 +222,7 @@ contract ReadBignum_Test is Test {
 
     function testFail_Int256_notbignum() public pure {
         bytes memory cbor = hex"c4";
-        uint32 i;
+        uint i;
         int256 value;
         (i, value) = cbor.Int256(i);
     }

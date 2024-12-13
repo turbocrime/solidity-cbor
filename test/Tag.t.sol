@@ -10,7 +10,7 @@ using ReadCbor for bytes;
 contract TagTest is Test {
     function test_decodeTag() public pure {
         bytes memory cbor = hex"c0"; // Tag(0)
-        uint32 i;
+        uint i;
         uint64 tag;
         (i, tag) = cbor.Tag(i);
         assert(i == cbor.length);
@@ -19,20 +19,20 @@ contract TagTest is Test {
 
     function test_decodeExpectedTag() public pure {
         bytes memory cbor = hex"c0"; // Tag(0)
-        uint32 i;
+        uint i;
         i = cbor.Tag(i, 0);
         assert(i == cbor.length);
     }
 
     function testFail_unexpectedTag() public pure {
         bytes memory cbor = hex"c0"; // Tag(0)
-        uint32 i;
+        uint i;
         cbor.Tag(i, 1);
     }
 
     function testFail_notTag() public pure {
         bytes memory cbor = hex"df"; // Not a tag
-        uint32 i;
+        uint i;
         cbor.Tag(i);
     }
 }

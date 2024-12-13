@@ -33,14 +33,14 @@ contract ReadCidSha256_Test is Test {
     function test_Cid_random(uint256 randomHash) public pure {
         vm.assume(randomHash != 0);
         bytes memory randomCidCbor = abi.encodePacked(dagHead, randomHash);
-        (uint32 i, CidSha256 rando) = randomCidCbor.Cid(0);
+        (uint i, CidSha256 rando) = randomCidCbor.Cid(0);
         assert(i == randomCidCbor.length);
         assert(CidSha256.unwrap(rando) == randomHash);
     }
 
     function test_NullableCid_random(uint256 randomHash) public pure {
         bytes memory randomCidCbor = randomHash != 0 ? abi.encodePacked(dagHead, randomHash) : nullCbor;
-        (uint32 i, CidSha256 rando) = randomCidCbor.NullableCid(0);
+        (uint i, CidSha256 rando) = randomCidCbor.NullableCid(0);
         assert(i == randomCidCbor.length);
         if (randomHash == 0) {
             assert(rando.isNull());

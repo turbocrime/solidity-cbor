@@ -63,15 +63,11 @@ library ReadCidSha256 {
      * @return uint The next byte index after the CID
      * @return CidSha256 The representative hash
      */
-    function Cid(bytes memory cbor, uint32 i) internal pure returns (uint32, CidSha256) {
+    function Cid(bytes memory cbor, uint i) internal pure returns (uint, CidSha256) {
         return Cid(cbor, i, 0x71);
     }
 
-    function Cid(bytes memory cbor, uint32 i, bytes1 multicodec)
-        internal
-        pure
-        returns (uint32 n, CidSha256 cidSha256)
-    {
+    function Cid(bytes memory cbor, uint i, bytes1 multicodec) internal pure returns (uint n, CidSha256 cidSha256) {
         bytes9 expect;
         bytes9 cborHeader;
         assembly ("memory-safe") {
@@ -98,7 +94,7 @@ library ReadCidSha256 {
      * @return Cid The decoded CID, or zero CID if null
      * @return uint The next byte index after the CID or null value
      */
-    function NullableCid(bytes memory cbor, uint32 i) internal pure returns (uint32, CidSha256) {
+    function NullableCid(bytes memory cbor, uint i) internal pure returns (uint, CidSha256) {
         return cbor.isNull(i) ? (i + 1, CidSha256.wrap(0)) : ReadCidSha256.Cid(cbor, i);
     }
 }
