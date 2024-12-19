@@ -8,19 +8,27 @@ using ReadCbor for bytes;
 
 /// @author turbocrime
 contract TagTest is Test {
-    function test_Tag() public pure {
+    function test_Tag() public {
         bytes memory cbor = hex"c0"; // Tag(0)
         uint i;
         uint64 tag;
+
+        vm.startSnapshotGas("Tag");
         (i, tag) = cbor.Tag(i);
+        vm.stopSnapshotGas();
+
         assert(i == cbor.length);
         assert(tag == 0);
     }
 
-    function test_Tag_expected() public pure {
+    function test_Tag_expected() public {
         bytes memory cbor = hex"c0"; // Tag(0)
         uint i;
+
+        vm.startSnapshotGas("Tag_expected");
         i = cbor.Tag(i, 0);
+        vm.stopSnapshotGas();
+
         assert(i == cbor.length);
     }
 
@@ -31,7 +39,7 @@ contract TagTest is Test {
     }
 
     function testFail_Tag_invalid() public pure {
-        bytes memory cbor = hex"df"; // Not a tag
+        bytes memory cbor = hex"01"; // unsigned int 1
         uint i;
         cbor.Tag(i);
     }

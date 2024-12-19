@@ -8,39 +8,55 @@ using ReadCbor for bytes;
 
 /// @author turbocrime
 contract StringTest is Test {
-    function test_String_empty() public pure {
+    function test_String_empty() public {
         bytes memory cbor = hex"60"; // zero-length string in CBOR
         uint i;
         string memory value;
+
+        vm.startSnapshotGas("String_empty");
         (i, value) = cbor.String(0);
+        vm.stopSnapshotGas();
+
         assert(bytes(value).length == 0);
     }
 
-    function test_String_short() public pure {
+    function test_String_short() public {
         // String with 23 bytes (just below the threshold for an extended header)
         bytes memory cbor = hex"77414141414141414141414141414141414141414141414141";
         uint i;
         string memory value;
+
+        vm.startSnapshotGas("String_short");
         (i, value) = cbor.String(0);
+        vm.stopSnapshotGas();
+
         assert(bytes(value).length == 23);
     }
 
-    function test_String_extended() public pure {
+    function test_String_extended() public {
         // String with 24 bytes (just at the threshold for an extended header)
         bytes memory cbor = hex"7741414141414141414141414141414141414141414141414141";
         uint i;
         string memory value;
+
+        vm.startSnapshotGas("String_extended");
         (i, value) = cbor.String(0);
+        vm.stopSnapshotGas();
+
         assert(bytes(value).length == 23);
     }
 
-    function test_String32_short() public pure {
+    function test_String32() public {
         // 1 character "a"
         bytes memory cbor = hex"6161";
         uint i;
         bytes32 value;
         uint8 len;
+
+        vm.startSnapshotGas("String32_short");
         (i, value, len) = cbor.String32(0);
+        vm.stopSnapshotGas();
+
         assert(i == cbor.length);
         assert(len == 1);
         assert(value == "a");
@@ -66,9 +82,13 @@ contract StringTest is Test {
         (i, value, len) = cbor.String32(0, 33);
     }
 
-    function test_skipString() public pure {
+    function test_skipString() public {
         bytes memory cbor = hex"6161";
+
+        vm.startSnapshotGas("skipString");
         uint i = cbor.skipString(0);
+        vm.stopSnapshotGas();
+
         assert(i == cbor.length);
     }
 
@@ -78,11 +98,15 @@ contract StringTest is Test {
         assert(cbor[i] == cbor[i]);
     }
 
-    function test_String1() public pure {
+    function test_String1() public {
         bytes memory cbor = hex"6161";
         uint i;
         bytes1 value;
+
+        vm.startSnapshotGas("String1");
         (i, value) = cbor.String1(0);
+        vm.stopSnapshotGas();
+
         assert(i == cbor.length);
         assert(value == bytes1("a"));
     }
