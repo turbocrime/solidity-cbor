@@ -8,7 +8,7 @@ using ReadCbor for bytes;
 
 contract ArrayTest is Test {
     // Test array handling
-    function test_decodeEmptyArray() public pure {
+    function test_Array_empty() public pure {
         bytes memory cbor = hex"80"; // Empty array in CBOR
         uint i;
         uint32 len;
@@ -16,7 +16,7 @@ contract ArrayTest is Test {
         assert(len == 0);
     }
 
-    function test_decodeLargeArray() public pure {
+    function test_Array_large() public pure {
         // Array with 23 elements (just below the threshold for extended header)
         bytes memory cbor = hex"97010101010101010101010101010101010101010101010101";
         uint i;
@@ -26,7 +26,7 @@ contract ArrayTest is Test {
     }
 
     // Test nested structures
-    function test_decodeNestedArray() public pure {
+    function test_Array_nested() public pure {
         // [[1, 2], [3, 4]]
         bytes memory cbor = hex"82820102820304";
         uint i;
@@ -56,7 +56,7 @@ contract ArrayTest is Test {
         assert(value == 4);
     }
 
-    function test_decodeSingleElementArray() public pure {
+    function test_Array_single() public pure {
         bytes memory cbor = hex"8118ff"; // [0xff]
         uint i;
         uint32 len;
@@ -69,7 +69,7 @@ contract ArrayTest is Test {
         assert(value == 0xff);
     }
 
-    function test_decodeMixedArray() public pure {
+    function test_Array_mixed() public pure {
         // [1, "a", [2]]
         bytes memory cbor = hex"830161618102";
 

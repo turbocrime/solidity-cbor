@@ -8,17 +8,7 @@ using ReadCbor for bytes;
 
 /// @author turbocrime
 contract BytesTest is Test {
-    // Additional bytes tests
-    function test_decodeMediumBytes() public pure {
-        // Bytes with 24 bytes (just above the threshold for one-byte length encoding)
-        bytes memory cbor = hex"5818000102030405060708090a0b0c0d0e0f101112131415161718"; // 24 bytes of incrementing values
-        uint i;
-        bytes memory value;
-        (i, value) = cbor.Bytes(0);
-        assert(value.length == 24);
-    }
-
-    function test_decodeEmptyBytes() public pure {
+    function test_Bytes_empty() public pure {
         bytes memory cbor = hex"40"; // zero-length bytes in CBOR
         uint i;
         bytes memory value;
@@ -27,7 +17,7 @@ contract BytesTest is Test {
         assert(value.length == 0);
     }
 
-    function test_decodeShortBytes() public pure {
+    function test_Bytes_short() public pure {
         // Bytes with 23 bytes (just below the threshold for an extended header)
         bytes memory cbor = hex"57000102030405060708090a0b0c0d0e0f1011121314151617";
         uint i;
@@ -36,7 +26,7 @@ contract BytesTest is Test {
         assert(value.length == 23);
     }
 
-    function test_decodeLongBytes() public pure {
+    function test_Bytes_extended() public pure {
         // Bytes with 24 bytes (just at the threshold for an extended header)
         bytes memory cbor = hex"5818000102030405060708090a0b0c0d0e0f101112131415161718";
         uint i;
@@ -57,7 +47,7 @@ contract BytesTest is Test {
         assert(value == bytes32(hex"00"));
     }
 
-    function testFail_Bytes32_long() public pure {
+    function testFail_Bytes32_too_long() public pure {
         // 33 bytes of data
         bytes memory cbor = hex"5821000102030405060708090a0b0c0d0e0f101112131415161718192021";
         uint i;

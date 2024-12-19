@@ -23,7 +23,7 @@ function intHead(uint64 num) pure returns (bytes memory) {
     }
 }
 
-contract ReadBignum_Test is Test {
+contract BignumTest is Test {
     using ReadCbor for bytes;
     using ReadBignum for bytes;
 

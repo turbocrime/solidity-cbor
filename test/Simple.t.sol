@@ -8,7 +8,7 @@ using ReadCbor for bytes;
 
 /// @author turbocrime
 contract SimpleTest is Test {
-    function test_decodeFalse() public pure {
+    function test_Boolean_false() public pure {
         bytes memory cbor = hex"f4";
         uint i;
         bool value;
@@ -16,7 +16,7 @@ contract SimpleTest is Test {
         assert(value == false);
     }
 
-    function test_decodeTrue() public pure {
+    function test_Boolean_true() public pure {
         bytes memory cbor = hex"f5";
         uint i;
         bool value;
@@ -24,7 +24,7 @@ contract SimpleTest is Test {
         assert(value == true);
     }
 
-    function testFail_decodeBool() public pure {
+    function testFail_Boolean_invalid() public pure {
         bytes memory cbor = hex"f6";
         uint i;
         bool value;

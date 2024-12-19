@@ -9,7 +9,7 @@ using ReadCbor for bytes;
 /// @author turbocrime
 contract MapTest is Test {
     // Test map handling
-    function test_decodeEmptyMap() public pure {
+    function test_Map_empty() public pure {
         bytes memory cbor = hex"a0"; // Empty map in CBOR
         uint i;
         uint len;
@@ -18,7 +18,7 @@ contract MapTest is Test {
     }
 
     // Additional map tests
-    function test_decodeSingleKeyMap() public pure {
+    function test_Map_single() public pure {
         bytes memory cbor = hex"a161618102"; // {"a": [2]}
         uint i;
         uint len;
@@ -38,48 +38,7 @@ contract MapTest is Test {
         assert(value == 2);
     }
 
-    // Test deeply nested structures
-    function test_deeplyNestedStructure() public pure {
-        // {"a": {"b": {"c": [1, 2, 3]}}}
-        bytes memory cbor = hex"a16161a16162a1616383010203";
-        uint i;
-        uint len;
-        bytes32 key;
-        uint arrayLen;
-        uint8 value;
-
-        (i, len) = cbor.Map(0);
-        assert(len == 1);
-
-        (i, key,) = cbor.String32(i, 1);
-        assert(bytes1(key) == "a");
-
-        (i, len) = cbor.Map(i);
-        assert(len == 1);
-
-        (i, key,) = cbor.String32(i, 1);
-        assert(bytes1(key) == "b");
-
-        (i, len) = cbor.Map(i);
-        assert(len == 1);
-
-        (i, key,) = cbor.String32(i, 1);
-        assert(bytes1(key) == "c");
-
-        (i, arrayLen) = cbor.Array(i);
-        assert(arrayLen == 3);
-
-        (i, value) = cbor.UInt8(i);
-        assert(value == 1);
-
-        (i, value) = cbor.UInt8(i);
-        assert(value == 2);
-
-        (i, value) = cbor.UInt8(i);
-        assert(value == 3);
-    }
-
-    function test_decodeNestedMap() public pure {
+    function test_Map_nested() public pure {
         // {"a": {"b": 1, "c": 2}, "d": 3}
         bytes memory cbor = hex"a26161a2616201616302616403";
         uint i;
@@ -138,6 +97,46 @@ contract MapTest is Test {
 
         (i, key,) = cbor.String32(i, 1);
         assert(key == "d");
+        (i, value) = cbor.UInt8(i);
+        assert(value == 3);
+    }
+
+    function test_Map_nested2() public pure {
+        // {"a": {"b": {"c": [1, 2, 3]}}}
+        bytes memory cbor = hex"a16161a16162a1616383010203";
+        uint i;
+        uint len;
+        bytes32 key;
+        uint arrayLen;
+        uint8 value;
+
+        (i, len) = cbor.Map(0);
+        assert(len == 1);
+
+        (i, key,) = cbor.String32(i, 1);
+        assert(bytes1(key) == "a");
+
+        (i, len) = cbor.Map(i);
+        assert(len == 1);
+
+        (i, key,) = cbor.String32(i, 1);
+        assert(bytes1(key) == "b");
+
+        (i, len) = cbor.Map(i);
+        assert(len == 1);
+
+        (i, key,) = cbor.String32(i, 1);
+        assert(bytes1(key) == "c");
+
+        (i, arrayLen) = cbor.Array(i);
+        assert(arrayLen == 3);
+
+        (i, value) = cbor.UInt8(i);
+        assert(value == 1);
+
+        (i, value) = cbor.UInt8(i);
+        assert(value == 2);
+
         (i, value) = cbor.UInt8(i);
         assert(value == 3);
     }
