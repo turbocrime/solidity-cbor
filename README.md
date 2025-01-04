@@ -15,10 +15,9 @@ This project was initially forked from [filecoin's CborDecode.sol](https://githu
 
 ## Usage
 
-Most methods accept parameters `bytes` of CBOR data and `uint32` index, and return an updated index (and one or more values if appropriate). Since the data parameter is always first, you may sugar calls via `using` directive.
+Most methods accept parameters `bytes` of CBOR data and `uint256` index, and return an updated index (and one or more values if appropriate). Since the data parameter is always first, you may sugar calls via `using` directive.
 
 CBOR natively supports values up to `uint64`, so the typical values returned are `uint64`. Some methods return other types.
-
 
 Deserialization methods are a capitalized name of the type like `UInt`, `NInt`, `Text`, `Map`, and so on for every CBOR type. These return a value of the equivalent solidity type when possible.
 
@@ -28,7 +27,6 @@ You can peek at the type of the next item with `isBytes` and so on.
 
 The caller is responsible for handling the index and using it to index the appropriate data. No 'cursor' metaphor is provided, but the example below demonstrates how a caller may define and use a cursor for convenience.
 
-
 ```solidity
 using ReadCbor for bytes;
 
@@ -36,22 +34,22 @@ bytes constant someBytes = hex"84616103616102";
 
 struct Cursor {
     bytes b;
-    uint32 i;
+    uint256 i;
 }
 
 function example() pure {
     Cursor memory c = Cursor(someBytes, 0);
-    uint32 len;
+    uint32 arrayLen;
 
-    (c.i, len) = c.b.Array(c.i);
+    (c.i, arrayLen) = c.b.Array(c.i);
 
-    assert(len == 4);
-
-    string[] memory arrayStrs = new string[](len / 2);
-    uint64[] memory arrayNums = new uint64[](len / 2);
+    // In this example, we know the array length.
+    assert(arrayLen == 4);
+    string[] memory arrayStrs = new string[](2);
+    uint64[] memory arrayNums = new uint64[](2);
 
     // CBOR arrays may contain items of any type.
-    for (uint32 arrayIdx = 0; arrayIdx < len; arrayIdx++) {
+    for (uint32 arrayIdx = 0; arrayIdx < arrayLen; arrayIdx++) {
         if (c.b.isString(c.i)) {
             (c.i, arrayStrs[arrayIdx / 2]) = c.b.String(c.i);
         } else if (c.b.isUInt(c.i)) {
@@ -59,7 +57,8 @@ function example() pure {
         }
     }
 
-    c.b.requireComplete(c.i);
+    // Require that the data was fully consumed.
+    require(c.b.length == c.i);
 }
 ```
 
