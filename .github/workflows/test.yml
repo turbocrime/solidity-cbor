@@ -39,12 +39,17 @@ jobs:
           forge build --sizes
         id: build
 
-      - name: Run Forge tests
+      - name: Confirm comparison snapshot
+        run: |
+          forge snapshot --match-path "test/comparison/*" --check
+        id: comparison-snapshot
+
+      - name: Run all Forge tests
         run: |
           forge test -vvv
         id: test
 
-      - name: Run snapshot
+      - name: Check snapshots directory did not update
         run: |
-          forge snapshot --match-path "test/comparison/*" --check
-        id: test-committed
+          git diff --exit-code snapshots
+        id: no-diff-snapshot
