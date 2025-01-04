@@ -5,16 +5,17 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  FOUNDRY_PROFILE: ci
-
 jobs:
   check:
     strategy:
       fail-fast: true
+      matrix:
+        foundry_profile: ["test-via-ir", "test-no-ir"]
 
     name: Foundry project
     runs-on: ubuntu-latest
+    env:
+      FOUNDRY_PROFILE: ${{ matrix.foundry_profile }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,23 +40,30 @@ jobs:
           forge build --sizes
         id: build
 
+      # This `forge snapshot` command is only used for CBORDecoder comparison.
+      # https://book.getfoundry.sh/forge/gas-section-snapshots
       - name: Confirm comparison snapshot
         run: |
-          forge snapshot --match-path "test/comparison/*" --check
+          forge snapshot --check ${{ env.FOUNDRY_PROFILE }}.gas-snapshot \
+            --match-path "test/comparison/*"
         id: comparison-snapshot
 
-      - name: Run all Forge tests
+      - name: Run remaining Forge tests, confirm section snapshots
         run: |
-          forge test -vvv
+          forge test -vvv \
+            --no-match-path "test/comparison/*"
+          git diff --exit-code snapshots-${{ env.FOUNDRY_PROFILE }}
         id: test
 
-      - name: Confirm section snapshots
-        run: |
-          git diff --exit-code snapshots
-        id: diff-section-snapshots
 
+      # Coverage testing affects gas cost, and creates different snapshots.
+      # Only `lcov.info` is diffed to confirm coverage is checked in.  Coverage
+      # doesn't use the 'comparison' tests.
       - name: Confirm coverage
         run: |
-          forge coverage --report lcov
-          git diff --exit-code lcov.info
+          forge coverage --report-file ${{ env.FOUNDRY_PROFILE }}.lcov.info \
+            --report lcov --report summary \
+            --no-match-path "test/comparison/*" \
+            --no-match-coverage "test/comparison/*"
+          git diff --exit-code ${{ env.FOUNDRY_PROFILE }}.lcov.info
         id: diff-coverage
