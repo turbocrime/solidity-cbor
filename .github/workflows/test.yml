@@ -57,7 +57,6 @@ jobs:
           git diff --exit-code snapshots-${{ env.FOUNDRY_PROFILE }}
         id: test
 
-
       # Coverage testing affects gas cost, and creates different snapshots.
       # Only `lcov.info` is diffed to confirm coverage is checked in.  Coverage
       # doesn't use the 'comparison' tests.

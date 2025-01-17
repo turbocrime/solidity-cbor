@@ -16,7 +16,6 @@ docs/
 node_modules
 
 # Hardhat files
-/cache
 /artifacts
 
 # TypeChain files

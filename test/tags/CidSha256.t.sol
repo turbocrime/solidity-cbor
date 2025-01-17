@@ -50,7 +50,9 @@ contract CidSha256Test is Test {
     }
 
     function test_fuzz_NullableCid_random(uint256 randomHash) public pure {
-        bytes memory randomCidCbor = randomHash != 0 ? abi.encodePacked(dagHead, randomHash) : nullCbor;
+        bytes memory randomCidCbor = randomHash != 0
+            ? abi.encodePacked(dagHead, randomHash)
+            : nullCbor;
         (uint i, CidSha256 rando) = randomCidCbor.NullableCid(0);
         assert(i == randomCidCbor.length);
         if (randomHash == 0) {

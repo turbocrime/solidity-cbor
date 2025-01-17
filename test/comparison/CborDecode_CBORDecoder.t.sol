@@ -31,7 +31,8 @@ contract ComparisonTest is Test {
 
     function test_decodeFixedArray_CBORDecoder() public pure {
         // [1,2,3,4,5,6,7,8,9,10,"test", h'01010101', false, null, true]
-        bytes memory input = hex"8F0102030405060708090A64746573744401010101F4F6F5";
+        bytes
+            memory input = hex"8F0102030405060708090A64746573744401010101F4F6F5";
         uint index = 0;
         uint arrayLen = 0;
         uint8 num;
@@ -71,7 +72,11 @@ contract ComparisonTest is Test {
         require(num == 10, "num is not 1");
 
         (str, index) = input.readString(index);
-        require(keccak256(abi.encodePacked(str)) == keccak256(abi.encodePacked("test")), "str is not 'test'");
+        require(
+            keccak256(abi.encodePacked(str)) ==
+                keccak256(abi.encodePacked("test")),
+            "str is not 'test'"
+        );
     }
 
     function test_decodeFalse_CBORDecoder() public pure {
@@ -116,7 +121,10 @@ contract ComparisonTest is Test {
         string memory expected = "test value";
 
         (value, index) = input.readString(0);
-        require(keccak256(bytes(value)) == keccak256(bytes(expected)), "value is not 'test value'");
+        require(
+            keccak256(bytes(value)) == keccak256(bytes(expected)),
+            "value is not 'test value'"
+        );
     }
 
     function test_decodeStringWithWeirdChar_CBORDecoder() public pure {
@@ -126,7 +134,10 @@ contract ComparisonTest is Test {
 
         (value, index) = input.readString(0);
         // Does solidity support this ?
-        require(keccak256(bytes(value)) == keccak256(bytes(unicode"zoé")), unicode"value is not 'zoé'");
+        require(
+            keccak256(bytes(value)) == keccak256(bytes(unicode"zoé")),
+            unicode"value is not 'zoé'"
+        );
     }
 
     function test_decodeArrayU8_CBORDecoder() public pure {

@@ -22,7 +22,8 @@ contract StringTest is Test {
 
     function test_String_short() public {
         // String with 23 bytes (just below the threshold for an extended header)
-        bytes memory cbor = hex"77414141414141414141414141414141414141414141414141";
+        bytes
+            memory cbor = hex"77414141414141414141414141414141414141414141414141";
         uint i;
         string memory value;
 
@@ -35,7 +36,8 @@ contract StringTest is Test {
 
     function test_String_extended() public {
         // String with 24 bytes (just at the threshold for an extended header)
-        bytes memory cbor = hex"7741414141414141414141414141414141414141414141414141";
+        bytes
+            memory cbor = hex"7741414141414141414141414141414141414141414141414141";
         uint i;
         string memory value;
 
@@ -64,7 +66,8 @@ contract StringTest is Test {
 
     function testFail_String32_too_long() public pure {
         // 33 characters "thisisquitealongstringisuppose..."
-        bytes memory cbor = hex"78217468697369737175697465616C6F6E67737472696E6769737570706F73652E2E2E";
+        bytes
+            memory cbor = hex"78217468697369737175697465616C6F6E67737472696E6769737570706F73652E2E2E";
         uint i;
         bytes32 value;
         uint8 len;
