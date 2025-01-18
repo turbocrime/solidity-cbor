@@ -12,12 +12,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        foundry_profile: ["test-via-ir", "test-no-ir"]
+        foundry_profile: ["via-ir", "no-ir"]
 
     name: Foundry project
     runs-on: ubuntu-latest
     env:
-      FOUNDRY_PROFILE: ${{ matrix.foundry_profile }}
+      FOUNDRY_PROFILE: test-${{ matrix.foundry_profile }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,7 +46,7 @@ jobs:
       # https://book.getfoundry.sh/forge/gas-section-snapshots
       - name: Confirm comparison snapshot
         run: |
-          forge snapshot --check ${{ env.FOUNDRY_PROFILE }}.gas-snapshot \
+          forge snapshot --check snapshots/${{ env.FOUNDRY_PROFILE }}/.gas-snapshot \
             --match-path "test/comparison/*"
         id: comparison-snapshot
 
@@ -54,7 +54,7 @@ jobs:
         run: |
           forge test -vvv \
             --no-match-path "test/comparison/*"
-          git diff --exit-code snapshots-${{ env.FOUNDRY_PROFILE }}
+          git diff --exit-code snapshots/${{ env.FOUNDRY_PROFILE }}
         id: test
 
       # Coverage testing affects gas cost, and creates different snapshots.
@@ -62,9 +62,9 @@ jobs:
       # doesn't use the 'comparison' tests.
       - name: Confirm coverage
         run: |
-          forge coverage --report-file ${{ env.FOUNDRY_PROFILE }}.lcov.info \
+          forge coverage --report-file coverage/lcov.info \
             --report lcov --report summary \
             --no-match-path "test/comparison/*" \
             --no-match-coverage "test/comparison/*"
-          git diff --exit-code ${{ env.FOUNDRY_PROFILE }}.lcov.info
+          git diff --exit-code coverage/lcov.info
         id: diff-coverage
