@@ -6,7 +6,6 @@ optimize = true
 optimizer_runs = 1000000
 via-ir = false
 
-
 [fmt]
 int_types = "preserve"
 

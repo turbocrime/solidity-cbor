@@ -1,5 +1,6 @@
 import type { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
+import "@nomicfoundation/hardhat-foundry";
 
 /*** begin typescript esm support snippet ***/
 /** @see https://github.com/NomicFoundation/hardhat/issues/3385#issuecomment-1841380253 **/
@@ -25,7 +26,13 @@ subtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {
 /*** end typescript esm support snippet ***/
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.28",
+  solidity: {
+    version: "0.8.28",
+    settings: {
+      evmVersion: "cancun",
+      optimizer: { enabled: true, runs: 1000000 },
+    },
+  },
 };
 
 export default config;
