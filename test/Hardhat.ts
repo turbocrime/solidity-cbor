@@ -3,7 +3,7 @@ import { expect } from "chai";
 import hre from "hardhat";
 import { getAddress, parseGwei } from "viem";
 
-describe("TestHardhat", function () {
+describe("TestFixture", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -13,7 +13,7 @@ describe("TestHardhat", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-    const reader = await hre.viem.deployContract("TestHardhat", [], {
+    const reader = await hre.viem.deployContract("TestFixture", [], {
       value: lockedAmount,
     });
 
@@ -59,7 +59,7 @@ describe("TestHardhat", function () {
 
         // We retrieve the contract with a different account to send a transaction
         const readerAsOtherAccount = await hre.viem.getContractAt(
-          "TestHardhat",
+          "TestFixture",
           reader.address,
           { client: { wallet: otherAccount } },
         );
@@ -68,9 +68,18 @@ describe("TestHardhat", function () {
         ).to.be.rejectedWith("You aren't the owner");
       });
 
-      it("Shouldn't fail to parse bytes", async function () {
+      it("Should revert if called with truncated data", async function () {
         const { reader } = await loadFixture(deployReadThisFixture);
+        await expect(reader.write.readThis([`0x4213`])).to.be.rejectedWith("Must read within bounds of cbor");
+      });
 
+      it("Should revert if called with extra data", async function () {
+        const { reader } = await loadFixture(deployReadThisFixture);
+        await expect(reader.write.readThis([`0x42131200`])).to.be.rejectedWith("Must read entire cbor");
+      });
+
+      it("Should parse bytes", async function () {
+        const { reader } = await loadFixture(deployReadThisFixture);
         await expect(reader.write.readThis([`0x421312`])).to.be.fulfilled;
       });
     });
@@ -87,9 +96,12 @@ describe("TestHardhat", function () {
         // get the withdrawal events in the latest block
         const withdrawalEvents = await reader.getEvents.ParsedBytes32();
         expect(withdrawalEvents).to.have.lengthOf(1);
-        expect(withdrawalEvents[0].args.item).to.equal(
+        const {i, item, len} = withdrawalEvents[0].args;
+        expect(item).to.equal(
           `0x1312000000000000000000000000000000000000000000000000000000000000`,
         );
+        expect(i).to.equal(3n);
+        expect(len).to.equal(2);
       });
     });
   });

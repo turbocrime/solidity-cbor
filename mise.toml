@@ -3,3 +3,4 @@ node = "23"
 
 [env]
 NODE_OPTIONS = "--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning"
+FORGE_SNAPSHOT_EMIT = "false"

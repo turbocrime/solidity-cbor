@@ -22,7 +22,7 @@
 pragma solidity ^0.8.17;
 
 import {Test} from "forge-std/Test.sol";
-import "./CborDecode.sol";
+import "./CBORDecoder.sol";
 
 /// @notice This file is meant to serve as a deployable contract to test the cbor decode library
 /// @author Zondax AG

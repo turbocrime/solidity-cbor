@@ -46,7 +46,7 @@ jobs:
       # https://book.getfoundry.sh/forge/gas-section-snapshots
       - name: Confirm comparison snapshot
         run: |
-          forge snapshot --check snapshots/${{ env.FOUNDRY_PROFILE }}/.gas-snapshot \
+          forge snapshot --check snapshots/${{ env.FOUNDRY_PROFILE }}/comparison.gas-snapshot \
             --match-path "test/comparison/*"
         id: comparison-snapshot
 

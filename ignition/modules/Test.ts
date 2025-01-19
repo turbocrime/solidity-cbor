@@ -6,14 +6,14 @@ import { parseEther } from "viem";
 
 const ONE_GWEI: bigint = parseEther("0.001");
 
-const TestHardhatModule = buildModule("TestHardhatModule", (m) => {
+const TestFixtureModule = buildModule("TestFixtureModule", (m) => {
   const lockedAmount = m.getParameter("lockedAmount", ONE_GWEI);
 
-  const reader = m.contract("TestHardhat", [], {
+  const reader = m.contract("Test", [], {
     value: lockedAmount,
   });
 
   return {  reader };
 });
 
-export default TestHardhatModule;
+export default TestFixtureModule;

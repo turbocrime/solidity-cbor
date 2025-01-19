@@ -15,6 +15,6 @@ for test_profile in no-ir via-ir; do
   export FOUNDRY_PROFILE=test-$test_profile
   mkdir -p snapshots/$test_profile
   export FORGE_SNAPSHOT_EMIT='true'
-  forge snapshot --force --snap snapshots/$test_profile/.gas-snapshot --match-path "test/comparison/*"
+  forge snapshot --force --snap snapshots/$test_profile/comparison.gas-snapshot --match-path "test/comparison/*"
   forge test --force -vvv --no-match-path "test/comparison/*"
 done
