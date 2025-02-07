@@ -62,15 +62,18 @@ contract CidSha256Test is Test {
         }
     }
 
-    function testFail_Cid_zeroCidCbor() public pure {
+    function testRevert_Cid_zeroCidCbor() public {
+        vm.expectRevert();
         zeroCidCbor.Cid(0);
     }
 
-    function testFail_Cid_nullCbor() public pure {
+    function testRevert_Cid_nullCbor() public {
+        vm.expectRevert();
         nullCbor.Cid(0);
     }
 
-    function testFail_Cid_NullableCid_zeroes() public pure {
+    function testRevert_Cid_NullableCid_zeroes() public {
+        vm.expectRevert();
         zeroCidCbor.NullableCid(0);
     }
 

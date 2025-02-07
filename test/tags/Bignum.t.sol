@@ -89,7 +89,7 @@ contract BignumTest is Test {
         assert(i == cbor.length);
     }
 
-    function testFail_UInt256_large() public pure {
+    function testRevert_UInt256_large() public {
         // a 33-byte positive bigint is too large to be a uint256
         bytes memory cbor = abi.encodePacked(
             HeadUBn,
@@ -100,6 +100,7 @@ contract BignumTest is Test {
         uint i;
         uint256 value;
 
+        vm.expectRevert();
         (i, value) = cbor.UInt256(i);
 
         // unreachable
@@ -171,7 +172,7 @@ contract BignumTest is Test {
         assert(i == cbor.length);
     }
 
-    function testFail_NInt256_overflow() public {
+    function testRevert_NInt256_overflow() public {
         // Invalid: one more than the 'maximum' negative number that can be represented as an int256
         bytes memory cbor = abi.encodePacked(
             HeadNBn,
@@ -181,15 +182,14 @@ contract BignumTest is Test {
         uint i;
         int256 value;
 
-        vm.startSnapshotGas("NInt256_overflow");
+        vm.expectRevert();
         (i, value) = cbor.NInt256(i);
-        vm.stopSnapshotGas();
 
         // unreachable
         assert(i == cbor.length);
     }
 
-    function testFail_NInt256_max() public pure {
+    function testRevert_NInt256_max() public {
         // Invalid: maximum uint256 value as negative bignum
         // 3(h'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
         bytes memory cbor = abi.encodePacked(
@@ -200,13 +200,14 @@ contract BignumTest is Test {
         uint i;
         int256 value;
 
+        vm.expectRevert();
         (i, value) = cbor.NInt256(i);
 
         // unreachable
         assert(i == cbor.length);
     }
 
-    function testFail_NInt256_large() public pure {
+    function testRevert_NInt256_large() public {
         // Invalid: 33-byte negative bignum is too large for int256
         bytes memory cbor = abi.encodePacked(
             HeadNBn,
@@ -217,6 +218,7 @@ contract BignumTest is Test {
         uint i;
         int256 value;
 
+        vm.expectRevert();
         (i, value) = cbor.NInt256(i);
 
         // unreachable
@@ -286,7 +288,7 @@ contract BignumTest is Test {
         assert(j == cbor.length);
     }
 
-    function testFail_Integer_UInt256_max() public pure {
+    function testRevert_Integer_UInt256_max() public {
         bytes memory cbor = abi.encodePacked(
             HeadUBn,
             bytesHead(32),
@@ -295,15 +297,17 @@ contract BignumTest is Test {
         uint i;
         int256 value;
 
+        vm.expectRevert();
         (i, value) = cbor.Integer(i);
         assert(uint256(value) == type(uint256).max);
         assert(i == cbor.length);
     }
 
-    function testFail_Int256_notbignum() public pure {
+    function testRevert_Int256_notbignum() public {
         bytes memory cbor = hex"c4";
         uint i;
         int256 value;
+        vm.expectRevert();
         (i, value) = cbor.Int256(i);
     }
 }

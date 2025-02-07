@@ -32,15 +32,17 @@ contract TagTest is Test {
         assert(i == cbor.length);
     }
 
-    function testFail_Tag_unexpected() public pure {
+    function testRevert_Tag_unexpected() public {
         bytes memory cbor = hex"c0"; // Tag(0)
         uint i;
+        vm.expectRevert();
         cbor.Tag(i, 1);
     }
 
-    function testFail_Tag_invalid() public pure {
+    function testRevert_Tag_invalid() public {
         bytes memory cbor = hex"01"; // unsigned int 1
         uint i;
+        vm.expectRevert();
         cbor.Tag(i);
     }
 }
