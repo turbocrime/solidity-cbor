@@ -28,6 +28,8 @@ jobs:
           run_install: true
       
       - name: Run hardhat tests
+        env: 
+          NODE_OPTIONS: "--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning"
         run: pnpm hardhat test
 
   foundry-check:
