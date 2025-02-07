@@ -8,7 +8,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
+  hardhat-check:
+    runs-on: ubuntu-latest
+    env:
+      FOUNDRY_PROFILE: hardhat
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Run hardhat tests
+        run: pnpm hardhat test
+
+  foundry-check:
     strategy:
       fail-fast: true
       matrix:
@@ -31,11 +46,6 @@ jobs:
       - name: Show Forge version
         run: |
           forge --version
-
-      - name: Run Forge fmt
-        run: |
-          forge fmt --check
-        id: fmt
 
       - name: Run Forge build
         run: |

@@ -22,7 +22,10 @@ contract TestFixture {
         uint8 limit = 12;
         (uint i, bytes32 parsed, uint8 len) = cbor.Bytes32(0, limit);
 
-        require(!(i > cbor.length), "TestFixture Must read within bounds of cbor");
+        require(
+            i <= cbor.length,
+            "TestFixture Must read within bounds of cbor"
+        );
         require(i == cbor.length, "TestFixture Must read entire cbor");
 
         emit ParsedBytes32(i, parsed, len);
