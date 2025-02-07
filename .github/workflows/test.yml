@@ -26,9 +26,12 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           run_install: true
-      
+
+      - name: Format check
+        run: pnpm prettier --check .
+
       - name: Run hardhat tests
-        env: 
+        env:
           NODE_OPTIONS: "--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning"
         run: pnpm hardhat test
 

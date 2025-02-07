@@ -5,6 +5,7 @@
   "scripts": {
     "test": "FORGE_SNAPSHOT_EMIT=false forge test && FOUNDRY_PROFILE=hardhat pnpm hardhat test",
     "compile": "forge compile && FOUNDRY_PROFILE=hardhat pnpm hardhat compile",
+    "format": "prettier --write .",
     "snapshots": "sh ./generate-snapshots.sh",
     "clean": "rm -rf cache_hardhat cache coverage artifacts"
   },
