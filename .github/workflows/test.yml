@@ -9,6 +9,7 @@ on:
 
 jobs:
   hardhat-check:
+    name: Hardhat project
     runs-on: ubuntu-latest
     env:
       FOUNDRY_PROFILE: hardhat
@@ -36,13 +37,12 @@ jobs:
         run: pnpm hardhat test
 
   foundry-check:
+    name: Foundry project
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
         foundry_profile: ["via-ir", "no-ir"]
-
-    name: Foundry project
-    runs-on: ubuntu-latest
     env:
       FOUNDRY_PROFILE: test-${{ matrix.foundry_profile }}
     steps:
