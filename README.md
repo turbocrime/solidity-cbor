@@ -1,10 +1,8 @@
 # turbocrime/solidity-cbor
 
-**This is a library for parsing CBOR.**
+**This is a library for parsing CBOR.** This library does not provide tools for writing CBOR.
 
-This library does not provide tools for writing CBOR.
-
-This project was initially forked from [filecoin's CborDecode.sol](https://github.com/Zondax/filecoin-solidity/blob/master/contracts/v0.8/utils/CborDecode.sol) by Zondax AG.
+This project was initially forked from [filecoin's CborDecode.sol](https://github.com/filecoin-project/filecoin-solidity/blob/master/contracts/v0.8/utils/CborDecode.sol).
 
 [RFC 8949](https://www.iana.org/go/rfc8949)
 
@@ -18,13 +16,13 @@ Most methods accept parameters `bytes` of CBOR data and `uint256` index, and ret
 
 CBOR natively supports values up to `uint64`, so the typical values returned are `uint64`. Some methods return other types.
 
-Deserialization methods are a capitalized name of the type like `UInt`, `NInt`, `Text`, `Map`, and so on for every CBOR type. These return a value of the equivalent solidity type when possible.
+Deserialization methods are a capitalized name of the type like `UInt`, `NInt`, `Bytes`, `Map`, and so on for every CBOR type. These return a value of the equivalent solidity type when possible.
 
-When specific format constraints exist, some optimized method variants are available, such as `String1` when the next should be a 1-byte string.
+When specific format constraints exist, some optimized method variants are available, such as `String1` when the next string should fit within a `bytes1`, or `String32` when the next string should fit within a `bytes32`.
 
-You can peek at the type of the next item with `isBytes` and so on.
+You can peek at the major type of the next CBOR item with `isBytes`, `isTag`, and so on.
 
-The caller is responsible for handling the index and using it to index the appropriate data. No 'cursor' metaphor is provided, but the example below demonstrates how a caller may define and use a cursor for convenience.
+The caller is responsible for managing the index and using it to index the appropriate data. No 'cursor' metaphor is provided, but the example below demonstrates how a caller may define and use a cursor for convenience.
 
 ```solidity
 using ReadCbor for bytes;

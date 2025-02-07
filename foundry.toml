@@ -1,10 +1,11 @@
 [profile.default]
-src = "src"
-out = "out"
-libs = ["lib"]
 optimize = true
 optimizer_runs = 1000000
-via-ir = false
+allow_internal_expectRevert = true
+
+[profile.hardhat]
+src = "contracts"
+skip = ["test", "src/*.sol"]
 
 [fmt]
 int_types = "preserve"

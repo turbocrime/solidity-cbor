@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "test": "FORGE_SNAPSHOT_EMIT=false forge test && pnpm hardhat test",
+    "test": "FORGE_SNAPSHOT_EMIT=false forge test && FOUNDRY_PROFILE=hardhat pnpm hardhat test",
     "snapshots": "sh ./generate-snapshots.sh",
     "clean": "rm -rf coverage snapshots artifacts"
   },
