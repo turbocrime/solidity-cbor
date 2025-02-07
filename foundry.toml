@@ -1,17 +1,22 @@
 [profile.default]
-src            = "src"
-out            = "out"
-libs           = ["lib"]
-optimize       = true
+src = "src"
+out = "out"
+libs = ["lib"]
+optimize = true
 optimizer_runs = 1000000
+allow_internal_expectRevert = true
+
+[profile.hardhat]
+src = "contracts"
+skip = ["test", "src/*.sol"]
 
 [fmt]
 int_types = "preserve"
 
 [profile.test-no-ir]
-via-ir    = false
-snapshots = "snapshots-test-no-ir"
+via-ir = false
+snapshots = "snapshots/no-ir"
 
 [profile.test-via-ir]
-via-ir    = true
-snapshots = "snapshots-test-via-ir"
+via-ir = true
+snapshots = "snapshots/via-ir"

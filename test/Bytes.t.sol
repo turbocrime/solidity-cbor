@@ -22,7 +22,8 @@ contract BytesTest is Test {
     }
 
     function test_Bytes_short() public {
-        bytes memory cbor = hex"57000102030405060708090a0b0c0d0e0f1011121314151617";
+        bytes
+            memory cbor = hex"57000102030405060708090a0b0c0d0e0f1011121314151617";
         uint i;
         bytes memory value;
 
@@ -34,7 +35,8 @@ contract BytesTest is Test {
     }
 
     function test_Bytes_extended() public {
-        bytes memory cbor = hex"5818000102030405060708090a0b0c0d0e0f101112131415161718";
+        bytes
+            memory cbor = hex"5818000102030405060708090a0b0c0d0e0f101112131415161718";
         uint i;
         bytes memory value;
 
@@ -60,23 +62,31 @@ contract BytesTest is Test {
         assert(value == bytes32(hex"00"));
     }
 
-    function testFail_Bytes32_too_long() public pure {
+    function testRevert_Bytes32_too_long() public {
         // 33 bytes of data
-        bytes memory cbor = hex"5821000102030405060708090a0b0c0d0e0f101112131415161718192021";
+        bytes
+            memory cbor = hex"5821000102030405060708090a0b0c0d0e0f101112131415161718192021";
         uint i;
         bytes32 value;
         uint8 len;
+        vm.expectRevert();
         (i, value, len) = cbor.Bytes32(0);
         assert(i == cbor.length);
         assert(len == 33);
-        assert(value == bytes32(hex"000102030405060708090a0b0c0d0e0f101112131415161718192021"));
+        assert(
+            value ==
+                bytes32(
+                    hex"000102030405060708090a0b0c0d0e0f101112131415161718192021"
+                )
+        );
     }
 
-    function testFail_Bytes32_parameter() public pure {
+    function testRevert_Bytes32_parameter() public {
         bytes memory cbor = hex"4100";
         uint i;
         bytes32 value;
         uint8 len;
+        vm.expectRevert();
         (i, value, len) = cbor.Bytes32(0, 33);
     }
 
@@ -90,8 +100,9 @@ contract BytesTest is Test {
         assert(i == cbor.length);
     }
 
-    function testFail_skipBytes() public pure {
+    function testRevert_skipBytes() public {
         bytes memory cbor = hex"30";
+        vm.expectRevert();
         uint i = cbor.skipBytes(0);
         assert(i == cbor.length);
     }

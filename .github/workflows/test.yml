@@ -8,16 +8,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
+  hardhat-check:
+    name: Hardhat project
+    runs-on: ubuntu-latest
+    env:
+      FOUNDRY_PROFILE: hardhat
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Format check
+        run: pnpm prettier --check .
+
+      - name: Run hardhat tests
+        env:
+          NODE_OPTIONS: "--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning"
+        run: pnpm hardhat test
+
+  foundry-check:
+    name: Foundry project
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        foundry_profile: ["test-via-ir", "test-no-ir"]
-
-    name: Foundry project
-    runs-on: ubuntu-latest
+        foundry_profile: ["via-ir", "no-ir"]
     env:
-      FOUNDRY_PROFILE: ${{ matrix.foundry_profile }}
+      FOUNDRY_PROFILE: test-${{ matrix.foundry_profile }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,11 +59,6 @@ jobs:
         run: |
           forge --version
 
-      - name: Run Forge fmt
-        run: |
-          forge fmt --check
-        id: fmt
-
       - name: Run Forge build
         run: |
           forge build --sizes
@@ -46,7 +68,7 @@ jobs:
       # https://book.getfoundry.sh/forge/gas-section-snapshots
       - name: Confirm comparison snapshot
         run: |
-          forge snapshot --check ${{ env.FOUNDRY_PROFILE }}.gas-snapshot \
+          forge snapshot --check snapshots/${{ matrix.foundry_profile }}/comparison.gas-snapshot \
             --match-path "test/comparison/*"
         id: comparison-snapshot
 
@@ -54,18 +76,17 @@ jobs:
         run: |
           forge test -vvv \
             --no-match-path "test/comparison/*"
-          git diff --exit-code snapshots-${{ env.FOUNDRY_PROFILE }}
+          git diff --exit-code snapshots/${{ matrix.foundry_profile }}
         id: test
-
 
       # Coverage testing affects gas cost, and creates different snapshots.
       # Only `lcov.info` is diffed to confirm coverage is checked in.  Coverage
       # doesn't use the 'comparison' tests.
       - name: Confirm coverage
         run: |
-          forge coverage --report-file ${{ env.FOUNDRY_PROFILE }}.lcov.info \
+          forge coverage --report-file coverage/lcov.info \
             --report lcov --report summary \
             --no-match-path "test/comparison/*" \
             --no-match-coverage "test/comparison/*"
-          git diff --exit-code ${{ env.FOUNDRY_PROFILE }}.lcov.info
+          git diff --exit-code coverage/lcov.info
         id: diff-coverage

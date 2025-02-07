@@ -72,13 +72,12 @@ contract IntTest is Test {
         assert(value == -1 - 0xFFFF_FFFF_FFFF_FFFF);
     }
 
-    function testFail_Int_not() public {
+    function testRevert_Int_not() public {
         bytes memory cbor = hex"f7";
         uint i;
         int value;
 
-        vm.startSnapshotGas("Int_not");
+        vm.expectRevert();
         (i, value) = cbor.Int(0);
-        vm.stopSnapshotGas();
     }
 }

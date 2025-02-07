@@ -31,10 +31,11 @@ contract NIntTest is Test {
         assert(value == -25); // -1 - 24
     }
 
-    function testFail_NInt8_invalid() public pure {
+    function testRevert_NInt8_invalid() public {
         bytes memory cbor = hex"3817"; // extended header too small
         uint i;
         int16 value;
+        vm.expectRevert();
         (i, value) = cbor.NInt8(i);
         assert(value == -24);
     }
@@ -50,10 +51,11 @@ contract NIntTest is Test {
         assert(value == -256); // -1 - 255
     }
 
-    function testFail_NInt8_too_long() public pure {
+    function testRevert_NInt8_too_long() public {
         bytes memory cbor = hex"39ffff"; // uint16 value
         uint i;
         int16 value;
+        vm.expectRevert();
         (i, value) = cbor.NInt8(0); // Should fail as value exceeds int8
     }
 
@@ -112,13 +114,15 @@ contract NIntTest is Test {
         assert(value == -2);
     }
 
-    function testFail_NInt16_too_long() public pure {
+    function testRevert_NInt16_too_long() public {
         bytes memory cbor = hex"3a00010000"; // uint32 value
+        vm.expectRevert();
         cbor.NInt16(0); // Should fail as value exceeds int16
     }
 
-    function testFail_NInt16_invalid() public pure {
+    function testRevert_NInt16_invalid() public {
         bytes memory cbor = hex"f4";
+        vm.expectRevert();
         cbor.NInt16(0);
     }
 

@@ -170,17 +170,26 @@ contract PeekTest is Test {
     }
 
     function test_fuzz_isTag_expect_rand_64(uint64 rand64) public pure {
-        bytes memory cbor = bytes.concat(bytes1(MajorTag << shiftMajor | MinorExtendU64), bytes8(rand64));
+        bytes memory cbor = bytes.concat(
+            bytes1((MajorTag << shiftMajor) | MinorExtendU64),
+            bytes8(rand64)
+        );
         assert(cbor.isTag(0, uint64(rand64)));
     }
 
     function test_fuzz_isTag_expect_rand_32(uint32 rand32) public pure {
-        bytes memory cbor = bytes.concat(bytes1(MajorTag << shiftMajor | MinorExtendU32), bytes4(rand32));
+        bytes memory cbor = bytes.concat(
+            bytes1((MajorTag << shiftMajor) | MinorExtendU32),
+            bytes4(rand32)
+        );
         assert(cbor.isTag(0, uint32(rand32)));
     }
 
     function test_fuzz_isTag_expect_rand_16(uint16 rand16) public pure {
-        bytes memory cbor = bytes.concat(bytes1(MajorTag << shiftMajor | MinorExtendU16), bytes2(rand16));
+        bytes memory cbor = bytes.concat(
+            bytes1((MajorTag << shiftMajor) | MinorExtendU16),
+            bytes2(rand16)
+        );
         assert(cbor.isTag(0, uint16(rand16)));
     }
 

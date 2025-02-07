@@ -22,136 +22,147 @@
 pragma solidity ^0.8.17;
 
 import {Test} from "forge-std/Test.sol";
-import "./CborDecode.sol";
+import {ReadCbor} from "../../src/ReadCbor.sol";
 
 /// @notice This file is meant to serve as a deployable contract to test the cbor decode library
 /// @author Zondax AG
 contract ComparisonTest is Test {
-    using CBORDecoder for bytes;
+    using ReadCbor for bytes;
 
-    function test_decodeFixedArray_CBORDecoder() public pure {
+    function test_decodeFixedArray_ReadCbor() public pure {
         // [1,2,3,4,5,6,7,8,9,10,"test", h'01010101', false, null, true]
-        bytes memory input = hex"8F0102030405060708090A64746573744401010101F4F6F5";
+        bytes
+            memory input = hex"8F0102030405060708090A64746573744401010101F4F6F5";
         uint index = 0;
-        uint arrayLen = 0;
+        uint32 arrayLen = 0;
         uint8 num;
         string memory str = "";
 
-        (arrayLen, index) = input.readFixedArray(index);
+        (index, arrayLen) = input.Array(index);
         require(arrayLen == 15, "array len is not 15");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 1, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 2, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 3, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 4, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 5, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 6, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 7, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 8, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 9, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 10, "num is not 1");
 
-        (str, index) = input.readString(index);
-        require(keccak256(abi.encodePacked(str)) == keccak256(abi.encodePacked("test")), "str is not 'test'");
+        (index, str) = input.String(index);
+        require(
+            keccak256(abi.encodePacked(str)) ==
+                keccak256(abi.encodePacked("test")),
+            "str is not 'test'"
+        );
     }
 
-    function test_decodeFalse_CBORDecoder() public pure {
+    function test_decodeFalse_ReadCbor() public pure {
         bytes memory input = hex"f4";
         uint index = 0;
         bool value;
 
-        (value, index) = input.readBool(0);
+        (index, value) = input.Bool(index);
         require(value == false, "value is not false");
     }
 
-    function test_decodeTrue_CBORDecoder() public pure {
+    function test_decodeTrue_ReadCbor() public pure {
         bytes memory input = hex"f5";
         uint index = 0;
         bool value;
 
-        (value, index) = input.readBool(0);
+        (index, value) = input.Bool(index);
         require(value == true, "value is not true");
     }
 
-    function test_decodeNull_CBORDecoder() public pure {
+    function test_decodeNull_ReadCbor() public pure {
         bytes memory input = hex"f6";
         bool value;
 
-        value = input.isNullNext(0);
+        value = input.isNull(0);
         require(value == true, "input is not null cbor");
     }
 
-    function test_decodeInteger_CBORDecoder() public pure {
+    function test_decodeInteger_ReadCbor() public pure {
         bytes memory input = hex"01";
         uint index = 0;
         uint8 value;
 
-        (value, index) = input.readUInt8(0);
+        (index, value) = input.UInt8(index);
         require(value == 1, "value is not 1");
     }
 
-    function test_decodeString_CBORDecoder() public pure {
+    function test_decodeString_ReadCbor() public pure {
         bytes memory input = hex"6a746573742076616c7565";
         uint index = 0;
         string memory value;
         string memory expected = "test value";
 
-        (value, index) = input.readString(0);
-        require(keccak256(bytes(value)) == keccak256(bytes(expected)), "value is not 'test value'");
+        (index, value) = input.String(index);
+        require(
+            keccak256(bytes(value)) == keccak256(bytes(expected)),
+            "value is not 'test value'"
+        );
     }
 
-    function test_decodeStringWithWeirdChar_CBORDecoder() public pure {
+    function test_decodeStringWithWeirdChar_ReadCbor() public pure {
         bytes memory input = hex"647A6FC3A9";
         uint index = 0;
         string memory value;
 
-        (value, index) = input.readString(0);
+        (index, value) = input.String(index);
         // Does solidity support this ?
-        require(keccak256(bytes(value)) == keccak256(bytes(unicode"zoé")), unicode"value is not 'zoé'");
+        require(
+            keccak256(bytes(value)) == keccak256(bytes(unicode"zoé")),
+            unicode"value is not 'zoé'"
+        );
     }
 
-    function test_decodeArrayU8_CBORDecoder() public pure {
+    function test_decodeArrayU8_ReadCbor() public pure {
         bytes memory input = hex"8501182b184218ea186f";
 
         uint index = 0;
-        uint arrayLen = 0;
+        uint32 arrayLen = 0;
         uint8 num;
 
-        (arrayLen, index) = input.readFixedArray(index);
+        (index, arrayLen) = input.Array(index);
         require(arrayLen == 5, "array len is not 5");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 1, "num is not 1");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 43, "num is not 43");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 66, "num is not 66");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 234, "num is not 234");
 
-        (num, index) = input.readUInt8(index);
+        (index, num) = input.UInt8(index);
         require(num == 111, "num is not 111");
     }
 }

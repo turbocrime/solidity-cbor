@@ -87,23 +87,23 @@ contract MapTest is Test {
         (i, outerLen) = cbor.Map(0);
         assert(outerLen == 2);
 
-        (i, key,) = cbor.String32(i, 1);
+        (i, key, ) = cbor.String32(i, 1);
         assert(key == "a");
 
         (i, innerLen) = cbor.Map(i);
         assert(innerLen == 2);
 
-        (i, key,) = cbor.String32(i, 1);
+        (i, key, ) = cbor.String32(i, 1);
         assert(key == "b");
         (i, value) = cbor.UInt8(i);
         assert(value == 1);
 
-        (i, key,) = cbor.String32(i, 1);
+        (i, key, ) = cbor.String32(i, 1);
         assert(key == "c");
         (i, value) = cbor.UInt8(i);
         assert(value == 2);
 
-        (i, key,) = cbor.String32(i, 1);
+        (i, key, ) = cbor.String32(i, 1);
         assert(key == "d");
         (i, value) = cbor.UInt8(i);
         assert(value == 3);
@@ -125,19 +125,19 @@ contract MapTest is Test {
         (i, len) = cbor.Map(0);
         assert(len == 1);
 
-        (i, key,) = cbor.String32(i, 1);
+        (i, key, ) = cbor.String32(i, 1);
         assert(bytes1(key) == "a");
 
         (i, len) = cbor.Map(i);
         assert(len == 1);
 
-        (i, key,) = cbor.String32(i, 1);
+        (i, key, ) = cbor.String32(i, 1);
         assert(bytes1(key) == "b");
 
         (i, len) = cbor.Map(i);
         assert(len == 1);
 
-        (i, key,) = cbor.String32(i, 1);
+        (i, key, ) = cbor.String32(i, 1);
         assert(bytes1(key) == "c");
 
         (i, arrayLen) = cbor.Array(i);

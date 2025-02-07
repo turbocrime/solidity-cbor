@@ -22,7 +22,8 @@ contract StringTest is Test {
 
     function test_String_short() public {
         // String with 23 bytes (just below the threshold for an extended header)
-        bytes memory cbor = hex"77414141414141414141414141414141414141414141414141";
+        bytes
+            memory cbor = hex"77414141414141414141414141414141414141414141414141";
         uint i;
         string memory value;
 
@@ -35,7 +36,8 @@ contract StringTest is Test {
 
     function test_String_extended() public {
         // String with 24 bytes (just at the threshold for an extended header)
-        bytes memory cbor = hex"7741414141414141414141414141414141414141414141414141";
+        bytes
+            memory cbor = hex"7741414141414141414141414141414141414141414141414141";
         uint i;
         string memory value;
 
@@ -62,23 +64,26 @@ contract StringTest is Test {
         assert(value == "a");
     }
 
-    function testFail_String32_too_long() public pure {
+    function testRevert_String32_too_long() public {
         // 33 characters "thisisquitealongstringisuppose..."
-        bytes memory cbor = hex"78217468697369737175697465616C6F6E67737472696E6769737570706F73652E2E2E";
+        bytes
+            memory cbor = hex"78217468697369737175697465616C6F6E67737472696E6769737570706F73652E2E2E";
         uint i;
         bytes32 value;
         uint8 len;
+        vm.expectRevert();
         (i, value, len) = cbor.String32(0);
         assert(len == 33);
         // missing the last character
         assert(value != bytes32("thisisquitealongstringisuppose.."));
     }
 
-    function testFail_String32_parameter() public pure {
+    function testRevert_String32_parameter() public {
         bytes memory cbor = hex"6161";
         uint i;
         bytes32 value;
         uint8 len;
+        vm.expectRevert();
         (i, value, len) = cbor.String32(0, 33);
     }
 
@@ -92,8 +97,9 @@ contract StringTest is Test {
         assert(i == cbor.length);
     }
 
-    function testFail_skipString() public pure {
+    function testRevert_skipString() public {
         bytes memory cbor = hex"50";
+        vm.expectRevert();
         uint i = cbor.skipString(0);
         assert(cbor[i] == cbor[i]);
     }
@@ -111,10 +117,11 @@ contract StringTest is Test {
         assert(value == bytes1("a"));
     }
 
-    function testFail_String1_empty() public pure {
+    function testRevert_String1_empty() public {
         bytes memory cbor = hex"60";
         uint i;
         bytes1 value;
+        vm.expectRevert();
         (i, value) = cbor.String1(0);
     }
 }

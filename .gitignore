@@ -12,3 +12,19 @@ docs/
 
 # Dotenv file
 .env
+
+node_modules
+
+# Hardhat files
+/artifacts
+
+# TypeChain files
+/typechain
+/typechain-types
+
+/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+ignition/deployments/chain-31337
+
+cache_hardhat

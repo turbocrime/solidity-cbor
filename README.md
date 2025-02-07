@@ -1,10 +1,8 @@
 # turbocrime/solidity-cbor
 
-**This is a library for parsing CBOR.**
+**This is a library for parsing CBOR.** This library does not provide tools for writing CBOR.
 
-This library does not provide tools for writing CBOR.
-
-This project was initially forked from [filecoin's CborDecode.sol](https://github.com/Zondax/filecoin-solidity/blob/master/contracts/v0.8/utils/CborDecode.sol) by Zondax AG.
+This project was initially forked from [filecoin's CborDecode.sol](https://github.com/filecoin-project/filecoin-solidity/blob/master/contracts/v0.8/utils/CborDecode.sol).
 
 [RFC 8949](https://www.iana.org/go/rfc8949)
 
@@ -12,20 +10,19 @@ This project was initially forked from [filecoin's CborDecode.sol](https://githu
 
 [CBOR Tags Registry](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml)
 
-
 ## Usage
 
 Most methods accept parameters `bytes` of CBOR data and `uint256` index, and return an updated index (and one or more values if appropriate). Since the data parameter is always first, you may sugar calls via `using` directive.
 
 CBOR natively supports values up to `uint64`, so the typical values returned are `uint64`. Some methods return other types.
 
-Deserialization methods are a capitalized name of the type like `UInt`, `NInt`, `Text`, `Map`, and so on for every CBOR type. These return a value of the equivalent solidity type when possible.
+Deserialization methods are a capitalized name of the type like `UInt`, `NInt`, `Bytes`, `Map`, and so on for every CBOR type. These return a value of the equivalent solidity type when possible.
 
-When specific format constraints exist, some optimized method variants are available, such as `String1` when the next should be a 1-byte string.
+When specific format constraints exist, some optimized method variants are available, such as `String1` when the next string should fit within a `bytes1`, or `String32` when the next string should fit within a `bytes32`.
 
-You can peek at the type of the next item with `isBytes` and so on.
+You can peek at the major type of the next CBOR item with `isBytes`, `isTag`, and so on.
 
-The caller is responsible for handling the index and using it to index the appropriate data. No 'cursor' metaphor is provided, but the example below demonstrates how a caller may define and use a cursor for convenience.
+The caller is responsible for managing the index and using it to index the appropriate data. No 'cursor' metaphor is provided, but the example below demonstrates how a caller may define and use a cursor for convenience.
 
 ```solidity
 using ReadCbor for bytes;
@@ -33,32 +30,32 @@ using ReadCbor for bytes;
 bytes constant someBytes = hex"84616103616102";
 
 struct Cursor {
-    bytes b;
-    uint256 i;
+  bytes b;
+  uint256 i;
 }
 
 function example() pure {
-    Cursor memory c = Cursor(someBytes, 0);
-    uint32 arrayLen;
+  Cursor memory c = Cursor(someBytes, 0);
+  uint32 arrayLen;
 
-    (c.i, arrayLen) = c.b.Array(c.i);
+  (c.i, arrayLen) = c.b.Array(c.i);
 
-    // In this example, we know the array length.
-    assert(arrayLen == 4);
-    string[] memory arrayStrs = new string[](2);
-    uint64[] memory arrayNums = new uint64[](2);
+  // In this example, we know the array length.
+  assert(arrayLen == 4);
+  string[] memory arrayStrs = new string[](2);
+  uint64[] memory arrayNums = new uint64[](2);
 
-    // CBOR arrays may contain items of any type.
-    for (uint32 arrayIdx = 0; arrayIdx < arrayLen; arrayIdx++) {
-        if (c.b.isString(c.i)) {
-            (c.i, arrayStrs[arrayIdx / 2]) = c.b.String(c.i);
-        } else if (c.b.isUInt(c.i)) {
-            (c.i, arrayNums[arrayIdx / 2]) = c.b.UInt(c.i);
-        }
+  // CBOR arrays may contain items of any type.
+  for (uint32 arrayIdx = 0; arrayIdx < arrayLen; arrayIdx++) {
+    if (c.b.isString(c.i)) {
+      (c.i, arrayStrs[arrayIdx / 2]) = c.b.String(c.i);
+    } else if (c.b.isUInt(c.i)) {
+      (c.i, arrayNums[arrayIdx / 2]) = c.b.UInt(c.i);
     }
+  }
 
-    // Require that the data was fully consumed.
-    require(c.b.length == c.i);
+  // Require that the data was fully consumed.
+  require(c.b.length == c.i);
 }
 ```
 

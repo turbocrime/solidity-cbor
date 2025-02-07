@@ -26,10 +26,11 @@ contract SimpleTest is Test {
         assert(i == cbor.length);
     }
 
-    function testFail_Boolean_invalid() public pure {
+    function testRevert_Boolean_invalid() public {
         bytes memory cbor = hex"f6";
         uint i;
         bool value;
+        vm.expectRevert();
         (i, value) = cbor.Bool(i);
     }
 
@@ -42,9 +43,10 @@ contract SimpleTest is Test {
         vm.stopSnapshotGas();
     }
 
-    function testFail_skipNull() public pure {
+    function testRevert_skipNull() public {
         bytes memory cbor = hex"f7";
         uint i;
+        vm.expectRevert();
         (i) = cbor.Null(i);
     }
 
@@ -57,9 +59,10 @@ contract SimpleTest is Test {
         vm.stopSnapshotGas();
     }
 
-    function testFail_skipUndefined() public pure {
+    function testRevert_skipUndefined() public {
         bytes memory cbor = hex"f6";
         uint i;
+        vm.expectRevert();
         (i) = cbor.Undefined(i);
     }
 }

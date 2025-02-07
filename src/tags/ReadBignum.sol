@@ -9,25 +9,30 @@ library ReadBignum {
     uint8 internal constant TagUnsignedBignum = 0x02;
     uint8 internal constant TagNegativeBignum = 0x03;
 
-    function UInt256(bytes memory cbor, uint i) internal pure returns (uint n, uint256 bn) {
+    function UInt256(
+        bytes memory cbor,
+        uint i
+    ) internal pure returns (uint n, uint256 bn) {
         uint8 len;
         i = cbor.Tag(i, TagUnsignedBignum);
         (i, len) = cbor.header8(i, MajorBytes);
         require(len <= 32, "bignum too large");
 
         assembly ("memory-safe") {
-            bn :=
-                shr(
-                    // Shift length within word
-                    mul(sub(32, len), 8),
-                    // Load bytes
-                    mload(add(add(cbor, 0x20), i))
-                )
+            bn := shr(
+                // Shift length within word
+                mul(sub(32, len), 8),
+                // Load bytes
+                mload(add(add(cbor, 0x20), i))
+            )
             n := add(i, len)
         }
     }
 
-    function NInt256(bytes memory cbor, uint i) internal pure returns (uint n, int256 nbn) {
+    function NInt256(
+        bytes memory cbor,
+        uint i
+    ) internal pure returns (uint n, int256 nbn) {
         uint8 len;
         i = cbor.Tag(i, TagNegativeBignum);
         (i, len) = cbor.header8(i, MajorBytes);
@@ -35,13 +40,12 @@ library ReadBignum {
 
         uint256 bn;
         assembly ("memory-safe") {
-            bn :=
-                shr(
-                    // Shift length within word
-                    mul(sub(32, len), 8),
-                    // Load bytes
-                    mload(add(add(cbor, 0x20), i))
-                )
+            bn := shr(
+                // Shift length within word
+                mul(sub(32, len), 8),
+                // Load bytes
+                mload(add(add(cbor, 0x20), i))
+            )
             n := add(i, len)
         }
 
@@ -49,7 +53,10 @@ library ReadBignum {
         nbn = -1 - int256(bn);
     }
 
-    function Int256(bytes memory cbor, uint i) internal pure returns (uint n, int256 ibn) {
+    function Int256(
+        bytes memory cbor,
+        uint i
+    ) internal pure returns (uint n, int256 ibn) {
         (, uint64 tag) = cbor.Tag(i);
         if (tag == TagUnsignedBignum) {
             uint256 ubn;
@@ -63,7 +70,10 @@ library ReadBignum {
         }
     }
 
-    function Integer(bytes memory cbor, uint i) internal pure returns (uint, int256) {
+    function Integer(
+        bytes memory cbor,
+        uint i
+    ) internal pure returns (uint, int256) {
         return cbor.isTag(i) ? Int256(cbor, i) : cbor.Int(i);
     }
 }

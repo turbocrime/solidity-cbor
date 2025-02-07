@@ -33,10 +33,11 @@ contract UIntTest is Test {
         assert(value == 0x18);
     }
 
-    function testFail_UInt8_invalid() public pure {
+    function testRevert_UInt8_invalid() public {
         bytes memory cbor = hex"1817"; // extended header too small
         uint i;
         uint8 value;
+        vm.expectRevert();
         (i, value) = cbor.UInt8(i);
         assert(value == 0x17);
     }
@@ -53,10 +54,11 @@ contract UIntTest is Test {
         assert(value == 0xff);
     }
 
-    function testFail_UInt8_too_long() public pure {
+    function testRevert_UInt8_too_long() public {
         bytes memory cbor = hex"19ffff"; // uint16 value
         uint i;
         uint8 value;
+        vm.expectRevert();
         (i, value) = cbor.UInt8(0); // Should fail as value exceeds uint8
     }
 
@@ -133,10 +135,11 @@ contract UIntTest is Test {
         assert(value == 0xffff);
     }
 
-    function testFail_UInt16_too_long() public pure {
+    function testRevert_UInt16_too_long() public {
         bytes memory cbor = hex"1a00010000"; // uint32 value
         uint i;
         uint16 value;
+        vm.expectRevert();
         (i, value) = cbor.UInt16(0); // Should fail as value exceeds uint16
     }
 }

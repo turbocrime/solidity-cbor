@@ -46,7 +46,8 @@ library ReadCidSha256 {
     //       12    │ multihash type sha-256
     //       20    │ multihash size 32 bytes
     //    ─────────┴─────────
-    bytes9 private constant cborTag42_cborBytes37_multibaseCidV1_multicodecZERO_multihashSha256_multihashBytes32 =
+    bytes9
+        private constant cborTag42_cborBytes37_multibaseCidV1_multicodecZERO_multihashSha256_multihashBytes32 =
         hex"D82A58250001001220";
 
     /**
@@ -63,20 +64,26 @@ library ReadCidSha256 {
      * @return uint The next byte index after the CID
      * @return CidSha256 The representative hash
      */
-    function Cid(bytes memory cbor, uint i) internal pure returns (uint, CidSha256) {
+    function Cid(
+        bytes memory cbor,
+        uint i
+    ) internal pure returns (uint, CidSha256) {
         return Cid(cbor, i, 0x71);
     }
 
-    function Cid(bytes memory cbor, uint i, bytes1 multicodec) internal pure returns (uint n, CidSha256 cidSha256) {
+    function Cid(
+        bytes memory cbor,
+        uint i,
+        bytes1 multicodec
+    ) internal pure returns (uint n, CidSha256 cidSha256) {
         bytes9 expect;
         bytes9 cborHeader;
         assembly ("memory-safe") {
             // expected head
-            expect :=
-                or(
-                    cborTag42_cborBytes37_multibaseCidV1_multicodecZERO_multihashSha256_multihashBytes32,
-                    shr(0x30, multicodec)
-                )
+            expect := or(
+                cborTag42_cborBytes37_multibaseCidV1_multicodecZERO_multihashSha256_multihashBytes32,
+                shr(0x30, multicodec)
+            )
             // cbor header at index
             cborHeader := mload(add(cbor, add(0x20, i)))
             cidSha256 := mload(add(cbor, add(0x29, i)))
@@ -94,7 +101,13 @@ library ReadCidSha256 {
      * @return Cid The decoded CID, or zero CID if null
      * @return uint The next byte index after the CID or null value
      */
-    function NullableCid(bytes memory cbor, uint i) internal pure returns (uint, CidSha256) {
-        return cbor.isNull(i) ? (i + 1, CidSha256.wrap(0)) : ReadCidSha256.Cid(cbor, i);
+    function NullableCid(
+        bytes memory cbor,
+        uint i
+    ) internal pure returns (uint, CidSha256) {
+        return
+            cbor.isNull(i)
+                ? (i + 1, CidSha256.wrap(0))
+                : ReadCidSha256.Cid(cbor, i);
     }
 }

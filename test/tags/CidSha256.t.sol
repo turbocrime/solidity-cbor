@@ -50,7 +50,9 @@ contract CidSha256Test is Test {
     }
 
     function test_fuzz_NullableCid_random(uint256 randomHash) public pure {
-        bytes memory randomCidCbor = randomHash != 0 ? abi.encodePacked(dagHead, randomHash) : nullCbor;
+        bytes memory randomCidCbor = randomHash != 0
+            ? abi.encodePacked(dagHead, randomHash)
+            : nullCbor;
         (uint i, CidSha256 rando) = randomCidCbor.NullableCid(0);
         assert(i == randomCidCbor.length);
         if (randomHash == 0) {
@@ -60,15 +62,18 @@ contract CidSha256Test is Test {
         }
     }
 
-    function testFail_Cid_zeroCidCbor() public pure {
+    function testRevert_Cid_zeroCidCbor() public {
+        vm.expectRevert();
         zeroCidCbor.Cid(0);
     }
 
-    function testFail_Cid_nullCbor() public pure {
+    function testRevert_Cid_nullCbor() public {
+        vm.expectRevert();
         nullCbor.Cid(0);
     }
 
-    function testFail_Cid_NullableCid_zeroes() public pure {
+    function testRevert_Cid_NullableCid_zeroes() public {
+        vm.expectRevert();
         zeroCidCbor.NullableCid(0);
     }
 

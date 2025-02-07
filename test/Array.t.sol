@@ -21,7 +21,8 @@ contract ArrayTest is Test {
 
     function test_Array_large() public {
         // Array with 23 elements (just below the threshold for extended header)
-        bytes memory cbor = hex"97010101010101010101010101010101010101010101010101";
+        bytes
+            memory cbor = hex"97010101010101010101010101010101010101010101010101";
         uint i;
         uint32 len;
 
