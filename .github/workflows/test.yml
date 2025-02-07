@@ -46,7 +46,7 @@ jobs:
       # https://book.getfoundry.sh/forge/gas-section-snapshots
       - name: Confirm comparison snapshot
         run: |
-          forge snapshot --check snapshots/${{ env.FOUNDRY_PROFILE }}/comparison.gas-snapshot \
+          forge snapshot --check snapshots/${{ matrix.foundry_profile }}/comparison.gas-snapshot \
             --match-path "test/comparison/*"
         id: comparison-snapshot
 
@@ -54,7 +54,7 @@ jobs:
         run: |
           forge test -vvv \
             --no-match-path "test/comparison/*"
-          git diff --exit-code snapshots/${{ env.FOUNDRY_PROFILE }}
+          git diff --exit-code snapshots/${{ matrix.foundry_profile }}
         id: test
 
       # Coverage testing affects gas cost, and creates different snapshots.

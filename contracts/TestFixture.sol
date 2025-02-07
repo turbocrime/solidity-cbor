@@ -3,6 +3,8 @@ pragma solidity ^0.8.28;
 
 import "../src/ReadCbor.sol";
 
+/// @title TestFixture
+/// @notice A small example contract fixture to confirm minimal function.
 contract TestFixture {
     uint public unlockTime;
     address payable public owner;
@@ -17,11 +19,11 @@ contract TestFixture {
     function readThis(bytes calldata cbor) public {
         require(msg.sender == owner, "You aren't the owner");
 
-        (uint i, bytes32 parsed, uint8 len) = cbor.Bytes32(0);
+        uint8 limit = 12;
+        (uint i, bytes32 parsed, uint8 len) = cbor.Bytes32(0, limit);
 
-        require(!(i > cbor.length), "Must read within bounds of cbor");
-        require(i == cbor.length, "Must read entire cbor");
-        require(len <= 32, "Result must be shorter than 32 bytes");
+        require(!(i > cbor.length), "TestFixture Must read within bounds of cbor");
+        require(i == cbor.length, "TestFixture Must read entire cbor");
 
         emit ParsedBytes32(i, parsed, len);
 

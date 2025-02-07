@@ -1,4 +1,7 @@
 [profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
 optimize = true
 optimizer_runs = 1000000
 allow_internal_expectRevert = true

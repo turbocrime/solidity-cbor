@@ -8,20 +8,15 @@ describe("TestFixture", function () {
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deployReadThisFixture() {
-    const lockedAmount = parseGwei("1");
-
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-    const reader = await hre.viem.deployContract("TestFixture", [], {
-      value: lockedAmount,
-    });
+    const reader = await hre.viem.deployContract("TestFixture", [], {});
 
     const publicClient = await hre.viem.getPublicClient();
 
     return {
       reader,
-      lockedAmount,
       owner,
       otherAccount,
       publicClient,
@@ -35,18 +30,6 @@ describe("TestFixture", function () {
       expect(await reader.read.owner()).to.equal(
         getAddress(owner.account.address),
       );
-    });
-
-    it("Should receive and store the funds to lock", async function () {
-      const { reader, lockedAmount, publicClient } = await loadFixture(
-        deployReadThisFixture,
-      );
-
-      expect(
-        await publicClient.getBalance({
-          address: reader.address,
-        }),
-      ).to.equal(lockedAmount);
     });
   });
 
@@ -70,12 +53,25 @@ describe("TestFixture", function () {
 
       it("Should revert if called with truncated data", async function () {
         const { reader } = await loadFixture(deployReadThisFixture);
-        await expect(reader.write.readThis([`0x4213`])).to.be.rejectedWith("Must read within bounds of cbor");
+        await expect(reader.write.readThis([`0x4213`])).to.be.rejectedWith(
+          "TestFixture Must read within bounds of cbor",
+        );
       });
 
       it("Should revert if called with extra data", async function () {
         const { reader } = await loadFixture(deployReadThisFixture);
-        await expect(reader.write.readThis([`0x42131200`])).to.be.rejectedWith("Must read entire cbor");
+        await expect(reader.write.readThis([`0x42131200`])).to.be.rejectedWith(
+          "TestFixture Must read entire cbor",
+        );
+      });
+
+      it("Should revert if called with unexpected data", async function () {
+        const { reader } = await loadFixture(deployReadThisFixture);
+        await expect(
+          reader.write.readThis([
+            `0x58211312000000000000000000000000000000000000000000000000000000000032`,
+          ]),
+        ).to.be.rejectedWith(""); // no reason string
       });
 
       it("Should parse bytes", async function () {
@@ -96,7 +92,7 @@ describe("TestFixture", function () {
         // get the withdrawal events in the latest block
         const withdrawalEvents = await reader.getEvents.ParsedBytes32();
         expect(withdrawalEvents).to.have.lengthOf(1);
-        const {i, item, len} = withdrawalEvents[0].args;
+        const { i, item, len } = withdrawalEvents[0].args;
         expect(item).to.equal(
           `0x1312000000000000000000000000000000000000000000000000000000000000`,
         );
